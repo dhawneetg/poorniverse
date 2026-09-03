@@ -1,0 +1,322 @@
+---
+// AttendanceModule.astro — Attendance engine with full Dark & Bright mode compatibility & opaque modals
+---
+
+<div class="space-y-6">
+  <!-- Top Aggregate Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Aggregate Score Card -->
+    <div class="lg:col-span-2 card-mobbin p-6 sm:p-8 flex flex-col justify-between">
+      <div class="flex flex-wrap items-start justify-between gap-6">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f1f3f5] dark:bg-[#27272a] text-[#52525b] dark:text-[#a1a1aa] border border-[#e4e4e7] dark:border-[#3f3f46]">
+              TCS iON Ingestion
+            </span>
+            <span class="text-xs text-[#71717a] dark:text-[#a1a1aa]">75% Mandatory Rule</span>
+          </div>
+          <h2 class="font-heading text-2xl sm:text-3xl mt-3 text-[#09090b] dark:text-white">Academic attendance health.</h2>
+          <p class="font-subheading text-xs sm:text-sm mt-1.5 max-w-xl text-[#52525b] dark:text-[#a1a1aa]">
+            Real-time projection of safe bunks and recovery targets based on total delivered lectures.
+          </p>
+        </div>
+
+        <!-- Overall Score Ring Badge (Bright & Dark Mode Harmonized) -->
+        <div class="flex items-center gap-5 card-inner-well p-5 rounded-2xl">
+          <div class="relative w-20 h-20 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+              <path
+                class="text-[#e4e4e7] dark:text-[#3f3f46]"
+                stroke-width="3.5"
+                stroke="currentColor"
+                fill="none"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path
+                id="overall-circle-bar"
+                class="text-[#047857] dark:text-[#10b981] transition-all duration-700"
+                stroke-dasharray="78, 100"
+                stroke-width="3.5"
+                stroke-linecap="round"
+                stroke="currentColor"
+                fill="none"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+            </svg>
+            <div class="absolute flex flex-col items-center">
+              <span id="overall-att-pct" class="text-lg font-heading text-[#09090b] dark:text-white">78.4%</span>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs text-[#71717a] dark:text-[#a1a1aa]">Total Attended</div>
+            <div id="overall-att-ratio" class="text-base font-bold text-[#09090b] dark:text-white">118 / 149</div>
+            <div id="overall-status-pill" class="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#ecfdf5] dark:bg-[#064e3b] text-[#047857] dark:text-[#34d399] border border-[#a7f3d0] dark:border-[#065f46]">
+              Above 75% Target
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Stadium Controls -->
+      <div class="mt-8 pt-6 border-t border-[#e4e4e7] dark:border-[#27272a] flex flex-wrap items-center gap-2.5 sm:gap-3">
+        <button 
+          id="btn-open-extension-modal"
+          class="pill-primary text-xs"
+        >
+          <span>Chrome Extension</span>
+        </button>
+
+        <button 
+          id="btn-open-paste-modal"
+          class="pill-outline text-xs"
+        >
+          <span>Paste Table</span>
+        </button>
+
+        <button 
+          id="btn-open-bookmarklet-modal"
+          class="pill-outline text-xs"
+        >
+          <span>Bookmarklet</span>
+        </button>
+
+        <button 
+          id="btn-add-subject-modal"
+          class="pill-outline text-xs"
+        >
+          <span>Add Course</span>
+        </button>
+
+        <button 
+          id="btn-mark-all-present"
+          class="ml-auto pill-soft text-xs text-[#047857] dark:text-[#34d399] hover:bg-[#ecfdf5] dark:hover:bg-[#064e3b]"
+          title="Mark present for all scheduled subjects today"
+        >
+          <span>Log Today (All Present)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Strategy & Rules Summary Card -->
+    <div class="card-mobbin p-6 sm:p-8 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-[#71717a] dark:text-[#a1a1aa] uppercase tracking-wider">Attendance Rules</span>
+        </div>
+        <h3 class="font-heading text-xl text-[#09090b] dark:text-white mt-2">75% attendance criteria.</h3>
+        <p class="font-caption text-xs mt-2 leading-relaxed text-[#52525b] dark:text-[#a1a1aa]">
+          Poornima College requires minimum 75% per course for Mid-Term and End-Term admit card clearance.
+        </p>
+
+        <div class="mt-5 space-y-3 text-xs">
+          <div class="p-3.5 rounded-2xl card-inner-well">
+            <div class="font-semibold text-[#09090b] dark:text-white">Safe Bunk Allowance</div>
+            <p class="text-[11px] text-[#52525b] dark:text-[#a1a1aa] mt-0.5">Lectures you can afford to miss while staying strictly at or above 75%.</p>
+          </div>
+          <div class="p-3.5 rounded-2xl card-inner-well">
+            <div class="font-semibold text-[#09090b] dark:text-white">Recovery Target</div>
+            <p class="text-[11px] text-[#52525b] dark:text-[#a1a1aa] mt-0.5">Consecutive lectures you must attend to climb back over 75%.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-[#e4e4e7] dark:border-[#27272a] text-[11px] text-[#71717a] dark:text-[#a1a1aa] flex items-center justify-between">
+        <span>Formula: <code class="font-mono text-[#09090b] dark:text-white font-semibold">Attended / Total &ge; 0.75</code></span>
+        <span class="text-[#71717a] dark:text-[#a1a1aa]">Live Simulator Active</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enrolled Courses Grid with Elevated Editorial Design -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <h3 class="font-heading text-xl text-[#09090b] dark:text-white">Enrolled Courses</h3>
+        <span id="subject-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#f1f3f5] dark:bg-[#27272a] text-[#52525b] dark:text-[#a1a1aa] border border-[#e4e4e7] dark:border-[#3f3f46]">6 Courses</span>
+      </div>
+      <div class="text-xs text-[#71717a] dark:text-[#a1a1aa]">
+        Use <span class="font-semibold text-[#09090b] dark:text-white">+ / -</span> to simulate hypothetical bunks or attended lectures
+      </div>
+    </div>
+
+    <div id="subjects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Subjects populated dynamically in app.ts with solid dark/light mode classes -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal 1: Paste from TCS iON (100% Opaque solid background) -->
+<div id="modal-paste-tcs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <h3 class="font-heading text-lg text-[#09090b] dark:text-white">Import from TCS iON</h3>
+      <button id="btn-close-paste-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <p class="text-xs text-[#52525b] dark:text-[#a1a1aa] leading-relaxed">
+      In your TCS iON portal Attendance tab, copy all table text (<kbd class="px-1.5 py-0.5 bg-[#f1f3f5] dark:bg-[#27272a] rounded border border-[#e4e4e7] dark:border-[#3f3f46] font-mono text-[11px] text-[#09090b] dark:text-white">Ctrl + A</kbd>), and paste it below. Course codes, delivered lectures, and attended counts will be extracted automatically.
+    </p>
+
+    <div>
+      <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Paste Raw Table / Text:</label>
+      <textarea 
+        id="tcs-paste-input" 
+        rows="7" 
+        class="field-input w-full font-mono text-xs"
+        placeholder="Example:
+CS301 Data Structures & Algorithms	28	32	87.5%
+CS302 Database Management Systems	22	28	78.6%
+CS303 Operating Systems	19	27	70.4%"
+      ></textarea>
+    </div>
+
+    <div class="flex items-center justify-between pt-3 border-t border-[#e4e4e7] dark:border-[#27272a]">
+      <button id="btn-load-sample-tcs" class="text-xs text-[#0066ff] dark:text-[#60a5fa] hover:underline font-semibold">
+        Load Sample Poornima Data
+      </button>
+      <div class="flex items-center gap-2">
+        <button id="btn-cancel-paste" class="pill-soft text-xs">
+          Cancel
+        </button>
+        <button id="btn-process-paste" class="pill-primary text-xs">
+          Parse & Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 2: 1-Click Bookmarklet Guide (100% Opaque solid background) -->
+<div id="modal-bookmarklet" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <h3 class="font-heading text-lg text-[#09090b] dark:text-white">TCS iON Bookmarklet</h3>
+      <button id="btn-close-bm-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <div class="space-y-4 text-xs text-[#52525b] dark:text-[#a1a1aa] leading-relaxed">
+      <div class="p-4 rounded-2xl card-inner-well text-[#09090b] dark:text-white">
+        <strong>How it works:</strong> Drag the button below into your browser Bookmarks Bar. When logged into TCS iON, clicking it instantly reads your attendance table into your clipboard.
+      </div>
+
+      <div class="flex flex-col items-center justify-center py-6 bg-[#f1f3f5] dark:bg-[#121215] rounded-2xl border border-[#e4e4e7] dark:border-[#27272a] gap-3">
+        <a 
+          id="bookmarklet-link" 
+          href="#" 
+          class="pill-primary text-sm shadow-sm cursor-grab active:cursor-grabbing"
+          onclick="event.preventDefault(); alert('Drag this button to your browser Bookmarks Bar (Ctrl + Shift + B to show bookmarks bar)');"
+        >
+          <span>Sync TCS iON Attendance</span>
+        </a>
+        <span class="text-[11px] text-[#71717a] dark:text-[#a1a1aa]">Drag this pill to your Bookmarks Bar</span>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Or Copy Javascript Code:</label>
+        <div class="relative">
+          <input 
+            id="bookmarklet-code-input" 
+            type="text" 
+            readonly 
+            class="field-input w-full font-mono text-[11px] pr-20"
+          />
+          <button 
+            id="btn-copy-bm-code"
+            class="absolute right-2 top-2 pill-primary py-1 px-3 text-[11px]"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end pt-2 border-t border-[#e4e4e7] dark:border-[#27272a]">
+      <button id="btn-close-bm" class="pill-soft text-xs">
+        Done
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 3: Add/Edit Subject Modal (100% OPAQUE SOLID CARD — NO BACKGROUND TEXT BLEED) -->
+<div id="modal-subject" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <h3 id="modal-sub-title" class="font-heading text-lg text-[#09090b] dark:text-white">Add Enrolled Course</h3>
+      <button id="btn-close-sub-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <form id="form-subject" class="space-y-4">
+      <input type="hidden" id="sub-input-id" />
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Subject Code & Name</label>
+        <div class="grid grid-cols-3 gap-2">
+          <input 
+            type="text" 
+            id="sub-input-code" 
+            required 
+            placeholder="CS301" 
+            class="field-input col-span-1 text-xs"
+          />
+          <input 
+            type="text" 
+            id="sub-input-name" 
+            required 
+            placeholder="Data Structures" 
+            class="field-input col-span-2 text-xs"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Attended Lectures</label>
+          <input 
+            type="number" 
+            id="sub-input-attended" 
+            min="0" 
+            required 
+            value="20" 
+            class="field-input w-full text-xs"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Total Classes Held</label>
+          <input 
+            type="number" 
+            id="sub-input-total" 
+            min="1" 
+            required 
+            value="25" 
+            class="field-input w-full text-xs"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Course Type</label>
+          <select id="sub-input-type" class="field-input w-full text-xs">
+            <option value="Lecture">Lecture Theory</option>
+            <option value="Lab">Practical Lab</option>
+            <option value="Tutorial">Tutorial</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Faculty Name (Optional)</label>
+          <input 
+            type="text" 
+            id="sub-input-faculty" 
+            placeholder="Dr. Sharma" 
+            class="field-input w-full text-xs"
+          />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4 border-t border-[#e4e4e7] dark:border-[#27272a]">
+        <button type="button" id="btn-cancel-sub" class="pill-soft text-xs">Cancel</button>
+        <button type="submit" class="pill-primary text-xs">Save Course</button>
+      </div>
+    </form>
+  </div>
+</div>

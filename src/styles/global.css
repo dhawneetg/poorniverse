@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-canvas: #f8f9fa;
+    --bg-canvas-soft: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-inner: #f4f4f5;
+    --bg-field: #f1f3f5;
+    --border-hairline: #e4e4e7;
+    --ink-primary: #09090b;
+    --ink-secondary: #52525b;
+    --ink-tertiary: #71717a;
+    --accent-blue: #0066ff;
+  }
+
+  .dark {
+    --bg-canvas: #09090b;
+    --bg-canvas-soft: #121215;
+    --bg-card: #18181b;
+    --bg-card-inner: #27272a;
+    --bg-field: #27272a;
+    --border-hairline: #27272a;
+    --ink-primary: #f4f4f5;
+    --ink-secondary: #a1a1aa;
+    --ink-tertiary: #71717a;
+    --accent-blue: #3b82f6;
+  }
+
+  html {
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
+  }
+
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.015em;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* Mobbin Neo-Grotesque Typography */
+.font-heading {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--ink-primary);
+}
+
+.font-subheading {
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  color: var(--ink-secondary);
+}
+
+.font-caption {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink-tertiary);
+}
+
+/* Mobbin 24px Radius Cards with explicit background guarantee */
+.card-mobbin {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: 24px;
+  color: var(--ink-primary);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-mobbin:hover {
+  border-color: var(--ink-primary);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.06);
+}
+
+.card-mobbin-soft {
+  background-color: var(--bg-canvas-soft);
+  border: 1px solid var(--border-hairline);
+  border-radius: 24px;
+  color: var(--ink-primary);
+}
+
+/* Inner Well Sub-cards */
+.card-inner-well {
+  background-color: var(--bg-card-inner);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  color: var(--ink-primary);
+}
+
+/* Stadium Pills */
+.pill-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--ink-primary);
+  color: var(--bg-card);
+  font-weight: 600;
+  padding: 8px 18px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.pill-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.pill-primary:active {
+  transform: translateY(0);
+}
+
+.pill-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: transparent;
+  border: 1px solid var(--border-hairline);
+  color: var(--ink-primary);
+  font-weight: 600;
+  padding: 7px 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.pill-outline:hover {
+  background-color: var(--bg-card-inner);
+  border-color: var(--ink-primary);
+}
+
+.pill-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--bg-card-inner);
+  color: var(--ink-primary);
+  font-weight: 600;
+  padding: 7px 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid var(--border-hairline);
+}
+
+.pill-soft:hover {
+  background-color: var(--bg-field);
+}
+
+/* 16px Corner Radius Inputs */
+.field-input {
+  border-radius: 16px;
+  background-color: var(--bg-field);
+  border: 1px solid var(--border-hairline);
+  color: var(--ink-primary);
+  padding: 10px 14px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.field-input:focus {
+  background-color: var(--bg-card);
+  border-color: var(--ink-primary);
+}
+
+/* 30% iOS Squircle Lettermarks */
+.squircle-tile {
+  border-radius: 30%;
+}
+
+/* View transition fade-in */
+.view-section {
+  animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

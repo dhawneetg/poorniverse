@@ -1,0 +1,186 @@
+---
+// CampusToolsModule.astro — Dark Mode Harmonized SGPA Calculator & Mess Menu
+---
+
+<div class="space-y-6">
+  <!-- SGPA / Internal Marks Target Simulator -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 card-mobbin p-6 sm:p-8 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">
+            Academic Grading Engine
+          </span>
+          <span class="text-xs text-[#707070] dark:text-[#a1a1aa]">40% Internal + 60% End-Term</span>
+        </div>
+
+        <h3 class="font-heading text-2xl mt-3 text-[#141414] dark:text-white">SGPA & End-Term Target Forecaster</h3>
+        <p class="font-subheading text-xs sm:text-sm mt-1 text-[#707070] dark:text-[#a1a1aa]">
+          Calculate minimum marks needed in End-Term theory exams based on your Mid-Term 1, Mid-Term 2, and Continuous Assessment marks.
+        </p>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-4 rounded-2xl card-inner-well space-y-1.5">
+            <label class="block text-xs font-semibold text-[#141414] dark:text-white">Mid-Term 1 (MT-1)</label>
+            <input 
+              type="number" 
+              id="sgpa-mt1" 
+              min="0" 
+              max="20" 
+              value="16" 
+              class="field-input w-full font-heading text-lg"
+            />
+            <span class="text-[10px] text-[#707070] dark:text-[#a1a1aa]">Max 20 Marks</span>
+          </div>
+
+          <div class="p-4 rounded-2xl card-inner-well space-y-1.5">
+            <label class="block text-xs font-semibold text-[#141414] dark:text-white">Mid-Term 2 (MT-2)</label>
+            <input 
+              type="number" 
+              id="sgpa-mt2" 
+              min="0" 
+              max="20" 
+              value="15" 
+              class="field-input w-full font-heading text-lg"
+            />
+            <span class="text-[10px] text-[#707070] dark:text-[#a1a1aa]">Max 20 Marks</span>
+          </div>
+
+          <div class="p-4 rounded-2xl card-inner-well space-y-1.5">
+            <label class="block text-xs font-semibold text-[#141414] dark:text-white">CA & Attendance (20M)</label>
+            <input 
+              type="number" 
+              id="sgpa-ca" 
+              min="0" 
+              max="20" 
+              value="18" 
+              class="field-input w-full font-heading text-lg"
+            />
+            <span class="text-[10px] text-[#707070] dark:text-[#a1a1aa]">Quizzes + Class Performance</span>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <label class="block text-xs font-semibold text-[#707070] dark:text-[#a1a1aa] mb-2">Desired Course Grade Target:</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button class="grade-target-btn active py-2 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs text-center transition-all" data-grade="A+" data-min="90">
+              A+ (90%+)
+            </button>
+            <button class="grade-target-btn py-2 rounded-full bg-[#f3f3f3] dark:bg-[#27272a] text-[#141414] dark:text-white font-semibold text-xs text-center transition-all hover:bg-[#e0e0e0] dark:hover:bg-[#3f3f46]" data-grade="A" data-min="80">
+              A (80%+)
+            </button>
+            <button class="grade-target-btn py-2 rounded-full bg-[#f3f3f3] dark:bg-[#27272a] text-[#141414] dark:text-white font-semibold text-xs text-center transition-all hover:bg-[#e0e0e0] dark:hover:bg-[#3f3f46]" data-grade="B" data-min="70">
+              B (70%+)
+            </button>
+            <button class="grade-target-btn py-2 rounded-full bg-[#f3f3f3] dark:bg-[#27272a] text-[#141414] dark:text-white font-semibold text-xs text-center transition-all hover:bg-[#e0e0e0] dark:hover:bg-[#3f3f46]" data-grade="Pass" data-min="40">
+              Pass (40%+)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 p-4 rounded-2xl card-inner-well flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <span class="text-xs text-[#707070] dark:text-[#a1a1aa]">Internal Assessment Total:</span>
+          <div id="sgpa-internal-total" class="font-heading text-xl text-[#141414] dark:text-white mt-0.5">33.5 / 40 (84%)</div>
+        </div>
+        <div class="sm:text-right">
+          <span class="text-xs text-[#707070] dark:text-[#a1a1aa]">Required in End-Term Exam:</span>
+          <div id="sgpa-required-endterm" class="font-heading text-2xl text-[#0066ff] dark:text-[#60a5fa] mt-0.5">57 / 60</div>
+          <p id="sgpa-advice-text" class="text-[11px] text-[#047857] dark:text-[#34d399] mt-0.5">Prepare PYQs to secure your target grade.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poornima Daily Mess Menu -->
+    <div class="card-mobbin p-6 sm:p-8 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">
+            Hostel Mess
+          </span>
+          <span id="mess-day-tag" class="text-xs font-semibold text-[#0066ff] dark:text-[#60a5fa]">Today</span>
+        </div>
+
+        <h3 class="font-heading text-xl mt-3 text-[#141414] dark:text-white">Daily Meal Schedule</h3>
+        <p class="font-caption text-xs mt-1 text-[#707070] dark:text-[#a1a1aa]">Poornima Hostel Dining Timings & Menu</p>
+
+        <div class="mt-5 space-y-2.5 text-xs">
+          <!-- Breakfast -->
+          <div class="p-3 rounded-2xl card-inner-well">
+            <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
+              <span>Breakfast (7:30 - 9:00 AM)</span>
+            </div>
+            <p id="mess-bf" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Aloo Paratha, Curd, Tea & Sprouts</p>
+          </div>
+
+          <!-- Lunch -->
+          <div class="p-3 rounded-2xl card-inner-well">
+            <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
+              <span>Lunch (12:30 - 2:00 PM)</span>
+            </div>
+            <p id="mess-lunch" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Dal Tadka, Seasonal Sabzi, Roti, Rice & Salad</p>
+          </div>
+
+          <!-- Evening Snacks -->
+          <div class="p-3 rounded-2xl card-inner-well">
+            <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
+              <span>Snacks (5:00 - 6:00 PM)</span>
+            </div>
+            <p id="mess-snacks" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Samosa / Poha & Hot Tea</p>
+          </div>
+
+          <!-- Dinner -->
+          <div class="p-3 rounded-2xl card-inner-well">
+            <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
+              <span>Dinner (7:45 - 9:30 PM)</span>
+            </div>
+            <p id="mess-dinner" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Paneer Butter Masala, Chapati, Pulao & Sweet Gulab Jamun</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-[#e0e0e0] dark:border-[#27272a] text-[11px] text-[#707070] dark:text-[#a1a1aa]">
+        Mess coupon required for external guests.
+      </div>
+    </div>
+  </div>
+
+  <!-- Campus Quick Links Grid -->
+  <div class="card-mobbin p-6 sm:p-8 space-y-4">
+    <h3 class="font-heading text-lg text-[#141414] dark:text-white">Official College Portals & Utilities</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+      <a href="https://www.tcsion.com" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl card-inner-well hover:border-[#141414] dark:hover:border-white transition-all">
+        <div class="w-7 h-7 squircle-tile bg-[#141414] dark:bg-white text-white dark:text-[#141414] flex items-center justify-center font-bold text-xs mb-2">
+          T
+        </div>
+        <div class="font-semibold text-[#141414] dark:text-white">TCS iON Portal</div>
+        <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Attendance & Timetable ↗</div>
+      </a>
+
+      <a href="https://poornima.org" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl card-inner-well hover:border-[#141414] dark:hover:border-white transition-all">
+        <div class="w-7 h-7 squircle-tile bg-[#141414] dark:bg-white text-white dark:text-[#141414] flex items-center justify-center font-bold text-xs mb-2">
+          P
+        </div>
+        <div class="font-semibold text-[#141414] dark:text-white">PCE Website</div>
+        <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Official Notices ↗</div>
+      </a>
+
+      <a href="https://lms.poornima.org" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl card-inner-well hover:border-[#141414] dark:hover:border-white transition-all">
+        <div class="w-7 h-7 squircle-tile bg-[#141414] dark:bg-white text-white dark:text-[#141414] flex items-center justify-center font-bold text-xs mb-2">
+          L
+        </div>
+        <div class="font-semibold text-[#141414] dark:text-white">PCE LMS</div>
+        <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Course Handouts ↗</div>
+      </a>
+
+      <a href="https://rtu.ac.in" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl card-inner-well hover:border-[#141414] dark:hover:border-white transition-all">
+        <div class="w-7 h-7 squircle-tile bg-[#141414] dark:bg-white text-white dark:text-[#141414] flex items-center justify-center font-bold text-xs mb-2">
+          R
+        </div>
+        <div class="font-semibold text-[#141414] dark:text-white">RTU Exam Portal</div>
+        <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">PYQs & Syllabus ↗</div>
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+---
+// TodoModule.astro — Dark Mode Harmonized Academic Tasks
+---
+
+<div class="card-mobbin p-6 sm:p-8 space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#e0e0e0] dark:border-[#27272a]">
+    <div>
+      <h3 class="font-heading text-xl text-[#141414] dark:text-white">Academic Tasks & Deadlines</h3>
+      <p class="font-caption text-xs text-[#707070] dark:text-[#a1a1aa]">Track assignments, midterm preparation, and submission deadlines</p>
+    </div>
+
+    <!-- Category Filter Segmented Pills -->
+    <div class="inline-flex p-1 bg-[#f3f3f3] dark:bg-[#27272a] rounded-full overflow-x-auto border border-[#e0e0e0] dark:border-[#3f3f46]">
+      <button class="todo-filter-btn active px-4 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all" data-filter="all">
+        All (<span id="todo-count-all">0</span>)
+      </button>
+      <button class="todo-filter-btn px-3.5 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium text-xs transition-all" data-filter="assignment">
+        Assignments
+      </button>
+      <button class="todo-filter-btn px-3.5 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium text-xs transition-all" data-filter="exam">
+        Exams
+      </button>
+      <button class="todo-filter-btn px-3.5 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium text-xs transition-all" data-filter="lab">
+        Lab Records
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Add Task Bar -->
+  <form id="form-add-todo" class="flex flex-wrap items-center gap-3">
+    <input 
+      type="text" 
+      id="todo-input-title" 
+      placeholder="Add a task (e.g. DSA Binary Trees Assignment 2)..." 
+      class="field-input flex-1 min-w-[240px] text-xs"
+      required
+    />
+    <select id="todo-input-category" class="field-input text-xs">
+      <option value="assignment">Assignment</option>
+      <option value="exam">Mid-Term / Exam</option>
+      <option value="lab">Lab File</option>
+      <option value="general">Personal</option>
+    </select>
+    <select id="todo-input-priority" class="field-input text-xs">
+      <option value="high">High Priority</option>
+      <option value="medium" selected>Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <input 
+      type="date" 
+      id="todo-input-due" 
+      class="field-input text-xs"
+    />
+    <button type="submit" class="pill-primary text-xs">
+      Add Task
+    </button>
+  </form>
+
+  <!-- Tasks List Container -->
+  <div id="todos-container" class="space-y-3 pt-2">
+    <!-- Populated dynamically in app.ts -->
+  </div>
+</div>

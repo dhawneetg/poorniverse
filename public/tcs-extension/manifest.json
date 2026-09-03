@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Poornima Companion — TCS iON Auto Sync",
+  "version": "1.0.0",
+  "description": "1-Click automated attendance synchronizer from TCS iON to Poornima Companion OS",
+  "permissions": ["activeTab", "tabs", "storage", "clipboardWrite", "scripting"],
+  "host_permissions": ["*://*.tcsion.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Sync Attendance to Poornima Companion"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.tcsion.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

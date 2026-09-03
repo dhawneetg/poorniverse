@@ -1,0 +1,148 @@
+---
+// Header.astro — Floating stadium navbar with Dark Mode & Mobile Navigation Dock
+---
+
+<!-- Desktop & Tablet Top Floating Bar -->
+<header class="sticky top-3 z-40 w-full px-3 sm:px-6 pointer-events-none">
+  <div class="max-w-7xl mx-auto flex items-center justify-between pointer-events-auto bg-white/90 dark:bg-[#18181b]/90 backdrop-blur-md border border-[#e4e4e7] dark:border-[#27272a] rounded-full px-3.5 sm:px-6 h-14 shadow-sm transition-colors">
+    <!-- Brand Lockup with 30% iOS Squircle Monogram -->
+    <div class="flex items-center gap-2.5 sm:gap-3">
+      <div class="w-8 h-8 squircle-tile bg-[#09090b] dark:bg-white text-white dark:text-[#09090b] flex items-center justify-center font-heading text-xs font-bold shrink-0 transition-colors">
+        P
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-heading text-sm text-[#09090b] dark:text-white tracking-tight">
+          Poornima
+        </span>
+        <span class="hidden md:inline-block px-2 py-0.5 text-[10px] font-semibold bg-[#f1f3f5] dark:bg-[#27272a] text-[#52525b] dark:text-[#a1a1aa] rounded-full border border-[#e4e4e7] dark:border-[#3f3f46]">
+          PCE OS
+        </span>
+      </div>
+    </div>
+
+    <!-- Centered Segmented Navigation Pills (Desktop Only) -->
+    <nav class="hidden md:flex items-center p-1 bg-[#f1f3f5] dark:bg-[#121215] rounded-full border border-[#e4e4e7] dark:border-[#27272a]">
+      <button 
+        class="nav-main-tab active px-4 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all shadow-sm whitespace-nowrap"
+        data-view="attendance"
+      >
+        <span>Attendance (75%)</span>
+      </button>
+
+      <button 
+        class="nav-main-tab px-4 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-xs transition-all whitespace-nowrap"
+        data-view="hostel"
+      >
+        <span>Hostel Quotas</span>
+      </button>
+
+      <button 
+        class="nav-main-tab px-4 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-xs transition-all whitespace-nowrap"
+        data-view="todos"
+      >
+        <span>Tasks & Deadlines</span>
+      </button>
+
+      <button 
+        class="nav-main-tab px-4 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-xs transition-all whitespace-nowrap"
+        data-view="tools"
+      >
+        <span>Tools & Mess</span>
+      </button>
+    </nav>
+
+    <!-- Right Controls: Cloud Sync, Dark Mode, Profile & Sign Out -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <!-- Sync Status Indicator -->
+      <div id="cloud-sync-indicator" class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f3f3f3] dark:bg-[#27272a] text-[10px] text-[#707070] dark:text-[#a1a1aa] font-medium">
+        <span id="cloud-sync-dot" class="w-1.5 h-1.5 rounded-full bg-[#047857]"></span>
+        <span id="cloud-sync-text">Cloud Sync</span>
+      </div>
+
+      <!-- Dark / Light Mode Toggle Button -->
+      <button 
+        id="btn-theme-toggle" 
+        class="p-2 rounded-full hover:bg-[#f3f3f3] dark:hover:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white transition-all"
+        title="Toggle Dark / Light Mode"
+      >
+        <!-- Sun Icon (shown in dark mode) -->
+        <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        <!-- Moon Icon (shown in light mode) -->
+        <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+      </button>
+
+      <!-- User Auth Pill -->
+      <div id="auth-unauthenticated" class="flex items-center">
+        <button 
+          id="btn-header-signin"
+          class="pill-primary text-xs py-1.5 px-3.5 sm:px-4"
+        >
+          Sign In
+        </button>
+      </div>
+
+      <div id="auth-authenticated" class="hidden flex items-center gap-1.5 sm:gap-2">
+        <div class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#f8f9fa] dark:bg-[#27272a] border border-[#e0e0e0] dark:border-[#3f3f46] text-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#047857]"></span>
+          <span id="header-user-display" class="font-semibold text-[#141414] dark:text-white max-w-[90px] sm:max-w-[120px] truncate">Student</span>
+        </div>
+        <button 
+          id="btn-header-signout"
+          class="pill-soft text-xs py-1.5 px-2.5 sm:px-3 text-[#b91c1c] dark:text-[#f87171] hover:bg-[#fef2f2] dark:hover:bg-[#450a0a]"
+          title="Sign out of your account"
+        >
+          Sign Out
+        </button>
+      </div>
+
+      <!-- Settings Icon -->
+      <button 
+        id="btn-open-settings" 
+        class="p-2 rounded-full hover:bg-[#f3f3f3] dark:hover:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white transition-all"
+        title="Settings & Cloud Database"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Floating Bottom Dock (iOS / Mobbin Style) -->
+<nav class="md:hidden fixed bottom-4 inset-x-4 z-40 pointer-events-none">
+  <div class="pointer-events-auto max-w-md mx-auto bg-white/95 dark:bg-[#18181b]/95 backdrop-blur-lg border border-[#e0e0e0] dark:border-[#27272a] rounded-full p-1.5 shadow-xl flex items-center justify-between transition-colors">
+    <button 
+      class="nav-main-tab active flex-1 py-2 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-[11px] text-center transition-all flex flex-col items-center gap-0.5"
+      data-view="attendance"
+    >
+      <span>Attendance</span>
+    </button>
+
+    <button 
+      class="nav-main-tab flex-1 py-2 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-[11px] text-center transition-all flex flex-col items-center gap-0.5"
+      data-view="hostel"
+    >
+      <span>Hostel</span>
+    </button>
+
+    <button 
+      class="nav-main-tab flex-1 py-2 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-[11px] text-center transition-all flex flex-col items-center gap-0.5"
+      data-view="todos"
+    >
+      <span>Tasks</span>
+    </button>
+
+    <button 
+      class="nav-main-tab flex-1 py-2 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-[11px] text-center transition-all flex flex-col items-center gap-0.5"
+      data-view="tools"
+    >
+      <span>Mess</span>
+    </button>
+  </div>
+</nav>

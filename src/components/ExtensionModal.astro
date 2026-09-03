@@ -1,0 +1,61 @@
+---
+// ExtensionModal.astro — 1-Click Chrome Extension for TCS iON (Dark & Light Mode)
+---
+
+<div id="modal-extension" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-6 sm:p-8 shadow-2xl space-y-6 relative z-10 opacity-100">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <div>
+        <h3 class="font-heading text-lg text-[#141414] dark:text-white">TCS iON Chrome Extension</h3>
+        <p class="font-caption text-xs text-[#707070] dark:text-[#a1a1aa]">For zero-effort automatic attendance synchronization</p>
+      </div>
+      <button id="btn-close-ext-modal" class="text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <div class="space-y-4 text-xs text-[#707070] dark:text-[#a1a1aa] leading-relaxed">
+      <div class="p-4 rounded-2xl card-inner-well text-[#141414] dark:text-white">
+        <strong>Give this to your friends:</strong> No need to copy-paste tables or inspect code. Installing the lightweight Chrome extension automatically places a <strong>"Sync with Poornima Companion"</strong> button right inside the TCS iON portal!
+      </div>
+
+      <div class="space-y-2.5">
+        <h4 class="font-heading text-xs text-[#141414] dark:text-white uppercase tracking-wider">3-Step Quick Install:</h4>
+        <div class="p-3.5 rounded-2xl card-inner-well flex items-start gap-3">
+          <span class="w-5 h-5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] flex items-center justify-center text-[11px] font-bold shrink-0">1</span>
+          <div>
+            <span class="font-semibold text-[#141414] dark:text-white">Open Chrome Extensions</span>
+            <p class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-0.5">Type <code class="font-mono bg-[#f0f0f0] dark:bg-[#27272a] px-1 py-0.5 rounded text-[#141414] dark:text-white">chrome://extensions</code> in your browser address bar and enable <strong>Developer mode</strong> (toggle top right).</p>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl card-inner-well flex items-start gap-3">
+          <span class="w-5 h-5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] flex items-center justify-center text-[11px] font-bold shrink-0">2</span>
+          <div>
+            <span class="font-semibold text-[#141414] dark:text-white">Load the Extension Folder</span>
+            <p class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-0.5">Click <strong>"Load unpacked"</strong> and select the <code class="font-mono bg-[#f0f0f0] dark:bg-[#27272a] px-1 py-0.5 rounded text-[#141414] dark:text-white">tcs-extension</code> folder inside this project directory.</p>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl card-inner-well flex items-start gap-3">
+          <span class="w-5 h-5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] flex items-center justify-center text-[11px] font-bold shrink-0">3</span>
+          <div>
+            <span class="font-semibold text-[#141414] dark:text-white">1-Click Sync</span>
+            <p class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-0.5">When you or your friend open TCS iON, click the extension icon to sync all attendance rows instantly into Poornima Companion!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between pt-3 border-t border-[#e0e0e0] dark:border-[#27272a]">
+      <a 
+        href="/tcs-extension/manifest.json" 
+        target="_blank" 
+        class="text-xs text-[#0066ff] dark:text-[#60a5fa] hover:underline font-semibold"
+      >
+        View Extension Source Files
+      </a>
+      <button id="btn-done-ext" class="pill-primary text-xs">
+        Got It
+      </button>
+    </div>
+  </div>
+</div>

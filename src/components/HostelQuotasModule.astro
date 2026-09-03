@@ -1,0 +1,486 @@
+---
+// HostelQuotasModule.astro — Dark Mode Harmonized Hostel Quotas & Wardrobe
+---
+
+<div class="space-y-6">
+  <!-- Sub-navigation Segmented Control -->
+  <div class="flex items-center justify-between border-b border-[#e0e0e0] dark:border-[#27272a] pb-4">
+    <div class="inline-flex p-1 bg-[#f3f3f3] dark:bg-[#18181b] rounded-full border border-[#e0e0e0] dark:border-[#27272a]">
+      <button 
+        id="tab-btn-laundry"
+        class="px-5 py-2 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all shadow-sm"
+      >
+        <span>Laundry & Wardrobe (60 Washes)</span>
+      </button>
+
+      <button 
+        id="tab-btn-ac"
+        class="px-5 py-2 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-xs transition-all"
+      >
+        <span>AC Meter (1000 Units Quota)</span>
+      </button>
+    </div>
+
+    <div class="text-xs text-[#707070] dark:text-[#a1a1aa] hidden sm:block">
+      Hostel Resource Budgeting
+    </div>
+  </div>
+
+  <!-- SECTION 1: LAUNDRY & WARDROBE SECTION -->
+  <div id="section-laundry" class="space-y-6">
+    <!-- Top Row: Quota Card + Smart Collection Advisor -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 60 Wash Quota Card -->
+      <div class="lg:col-span-1 card-mobbin p-7 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">
+              Laundry Token Quota
+            </span>
+            <span class="text-xs text-[#707070] dark:text-[#a1a1aa]">1st Year Allotment</span>
+          </div>
+
+          <div class="mt-5 flex items-baseline gap-2">
+            <span id="laundry-left-count" class="font-heading text-4xl text-[#141414] dark:text-white">54</span>
+            <span class="text-sm text-[#707070] dark:text-[#a1a1aa]">/ 60 tokens</span>
+          </div>
+          <div class="text-xs text-[#707070] dark:text-[#a1a1aa] mt-1"><span id="laundry-used-count" class="font-semibold text-[#141414] dark:text-white">6</span> washes consumed</div>
+
+          <!-- Progress Bar -->
+          <div class="mt-4">
+            <div class="w-full bg-[#f0f0f0] dark:bg-[#27272a] h-2 rounded-full overflow-hidden border border-[#e0e0e0] dark:border-[#3f3f46]">
+              <div id="laundry-progress-bar" class="bg-[#141414] dark:bg-white h-full rounded-full transition-all duration-500" style="width: 10%"></div>
+            </div>
+          </div>
+
+          <!-- Target Duration Customizer -->
+          <div class="mt-6 p-4 rounded-2xl card-inner-well space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-[#707070] dark:text-[#a1a1aa]">Target Timeline:</span>
+              <span id="laundry-duration-label" class="font-semibold text-[#141414] dark:text-white">5 Months</span>
+            </div>
+            <input 
+              type="range" 
+              id="laundry-duration-slider" 
+              min="3" 
+              max="10" 
+              value="5" 
+              step="1"
+              class="w-full accent-[#141414] dark:accent-white bg-[#e0e0e0] dark:bg-[#3f3f46] h-1.5 rounded-lg cursor-pointer"
+            />
+            <div class="flex justify-between text-[10px] text-[#707070] dark:text-[#a1a1aa]">
+              <span>3 Months (Fast)</span>
+              <span>5 Months (Semester)</span>
+              <span>10 Months (Full Year)</span>
+            </div>
+            <div class="pt-2.5 border-t border-[#e0e0e0] dark:border-[#3f3f46] text-xs flex items-center justify-between">
+              <span class="text-[#707070] dark:text-[#a1a1aa]">Permitted Burn Rate:</span>
+              <span id="laundry-weekly-rate" class="font-semibold text-[#047857] dark:text-[#34d399]">~2.7 Washes / Wk</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-5 border-t border-[#e0e0e0] dark:border-[#27272a]">
+          <button 
+            id="btn-use-laundry-token"
+            class="pill-primary w-full py-3"
+          >
+            <span>Record Laundry Hand-off (-1 Token)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Smart Collection Advisor Card -->
+      <div class="lg:col-span-2 card-mobbin-soft p-6 sm:p-8 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-xs font-semibold text-[#707070] dark:text-[#a1a1aa] uppercase tracking-wider">Automated Advisor</span>
+              <h3 class="font-heading text-xl text-[#141414] dark:text-white mt-1">Wash Schedule & Accumulation</h3>
+            </div>
+            <span id="advisor-status-badge" class="px-3 py-1 rounded-full text-[11px] font-semibold bg-[#ecfdf5] dark:bg-[#064e3b] text-[#047857] dark:text-[#34d399] border border-[#a7f3d0] dark:border-[#065f46]">
+              Pace On-Track
+            </span>
+          </div>
+
+          <!-- Recommendation Message Box -->
+          <div id="advisor-message-box" class="mt-5 p-5 rounded-2xl card-inner-well space-y-1.5">
+            <h4 id="advisor-heading" class="font-heading text-base text-[#141414] dark:text-white">Start Gathering Clothes Today</h4>
+            <p id="advisor-desc" class="text-xs text-[#707070] dark:text-[#a1a1aa] leading-relaxed">
+              You have 12 dirty items accumulated (including 2 uniform shirts and 4 t-shirts). Giving laundry now maintains your 5-month target pace of ~2.7 washes/week without running out of tokens early.
+            </p>
+          </div>
+
+          <!-- Dirty Clothes Summary Tiles -->
+          <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-4 rounded-2xl card-inner-well flex flex-col items-center text-center">
+              <span class="text-[#707070] dark:text-[#a1a1aa] text-[11px]">Dirty Uniforms</span>
+              <span id="dirty-uniforms-stat" class="font-heading text-lg text-[#141414] dark:text-white mt-1">3 items</span>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well flex flex-col items-center text-center">
+              <span class="text-[#707070] dark:text-[#a1a1aa] text-[11px]">Dirty Casuals</span>
+              <span id="dirty-casuals-stat" class="font-heading text-lg text-[#141414] dark:text-white mt-1">5 items</span>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well flex flex-col items-center text-center">
+              <span class="text-[#707070] dark:text-[#a1a1aa] text-[11px]">Innerwear & Misc</span>
+              <span id="dirty-misc-stat" class="font-heading text-lg text-[#141414] dark:text-white mt-1">4 items</span>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well flex flex-col items-center text-center">
+              <span class="text-[#707070] dark:text-[#a1a1aa] text-[11px]">Total Dirty Batch</span>
+              <span id="dirty-total-stat" class="font-heading text-lg text-[#0066ff] dark:text-[#60a5fa] mt-1">12 items</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wash Batch Threshold Setting -->
+        <div class="mt-5 pt-4 border-t border-[#e0e0e0] dark:border-[#27272a] flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-[#707070] dark:text-[#a1a1aa]">Trigger laundry when dirty pile reaches:</span>
+            <select id="select-batch-threshold" class="field-input py-1 px-3 text-xs font-semibold">
+              <option value="6">6 clothes (Small)</option>
+              <option value="8">8 clothes (Medium)</option>
+              <option value="10" selected>10 clothes (Optimal)</option>
+              <option value="14">14 clothes (Large)</option>
+            </select>
+          </div>
+          <span class="text-[#707070] dark:text-[#a1a1aa] text-[11px]">Conserves token quota</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wardrobe & "What to Wear Tomorrow" Assistant -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- What to Wear Recommender -->
+      <div class="lg:col-span-1 card-mobbin p-7 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between">
+            <h3 class="font-heading text-lg text-[#141414] dark:text-white">What to Wear Tomorrow</h3>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">Planner</span>
+          </div>
+
+          <div class="mt-5 space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#707070] dark:text-[#a1a1aa] mb-2">Tomorrow's Schedule:</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button 
+                  id="btn-wear-uniform"
+                  class="wear-type-btn active py-2 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs text-center transition-all"
+                  data-type="uniform"
+                >
+                  Uniform
+                </button>
+                <button 
+                  id="btn-wear-lab"
+                  class="wear-type-btn py-2 rounded-full bg-[#f3f3f3] dark:bg-[#27272a] text-[#141414] dark:text-white font-semibold text-xs text-center transition-all hover:bg-[#e0e0e0] dark:hover:bg-[#3f3f46]"
+                  data-type="lab"
+                >
+                  Lab Day
+                </button>
+                <button 
+                  id="btn-wear-casual"
+                  class="wear-type-btn py-2 rounded-full bg-[#f3f3f3] dark:bg-[#27272a] text-[#141414] dark:text-white font-semibold text-xs text-center transition-all hover:bg-[#e0e0e0] dark:hover:bg-[#3f3f46]"
+                  data-type="casual"
+                >
+                  Casual
+                </button>
+              </div>
+            </div>
+
+            <!-- Recommendation Result Box -->
+            <div id="wear-recommendation-card" class="p-4 rounded-2xl card-inner-well space-y-2">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[#e0e0e0] dark:border-[#27272a] text-[11px] text-[#707070] dark:text-[#a1a1aa]">
+          Uniform checked strictly at Poornima campus gates.
+        </div>
+      </div>
+
+      <!-- Wardrobe Category & Quantity Manager -->
+      <div class="lg:col-span-2 card-mobbin p-7">
+        <div class="flex items-center justify-between pb-4 border-b border-[#e0e0e0] dark:border-[#27272a]">
+          <div>
+            <h3 class="font-heading text-lg text-[#141414] dark:text-white">Wardrobe Inventory</h3>
+            <p class="font-caption text-xs text-[#707070] dark:text-[#a1a1aa]">Track clean, dirty, and laundry items in closet</p>
+          </div>
+          <button 
+            id="btn-add-cloth-category"
+            class="pill-outline text-xs"
+          >
+            <span>Add Category</span>
+          </button>
+        </div>
+
+        <div id="clothes-inventory-container" class="mt-5 space-y-3">
+          <!-- Dynamically populated in app.ts -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: AC ELECTRICITY SECTION (1000 Units Quota) -->
+  <div id="section-ac" class="space-y-6 hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- AC Hero Quota Meter -->
+      <div class="lg:col-span-1 card-mobbin p-7 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">
+              AC Unit Meter
+            </span>
+            <span class="text-xs text-[#707070] dark:text-[#a1a1aa]">1000 Total Units</span>
+          </div>
+
+          <div class="mt-6 flex items-center justify-between">
+            <div>
+              <div class="text-xs text-[#707070] dark:text-[#a1a1aa]">Units Consumed</div>
+              <div class="font-heading text-3xl text-[#141414] dark:text-white mt-0.5">
+                <span id="ac-used-val">61</span> <span class="text-xs text-[#707070] dark:text-[#a1a1aa] font-normal">Units</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-[#707070] dark:text-[#a1a1aa]">Remaining Units</div>
+              <div class="font-heading text-3xl text-[#0066ff] dark:text-[#60a5fa] mt-0.5">
+                <span id="ac-remaining-val">939</span> <span class="text-xs text-[#707070] dark:text-[#a1a1aa] font-normal">Units</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Linear Meter -->
+          <div class="mt-5 space-y-1.5">
+            <div class="w-full bg-[#f0f0f0] dark:bg-[#27272a] h-2.5 rounded-full overflow-hidden border border-[#e0e0e0] dark:border-[#3f3f46]">
+              <div id="ac-meter-bar" class="bg-[#141414] dark:bg-white h-full rounded-full transition-all duration-500" style="width: 6.1%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-[#707070] dark:text-[#a1a1aa]">
+              <span>6.1% Used</span>
+              <span>93.9% Available</span>
+            </div>
+          </div>
+
+          <!-- Daily Burn Metrics -->
+          <div class="mt-6 p-4 rounded-2xl card-inner-well space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-[#707070] dark:text-[#a1a1aa]">Average Daily Burn:</span>
+              <span id="ac-daily-avg" class="font-semibold text-[#141414] dark:text-white">~1.9 Units / Day</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#707070] dark:text-[#a1a1aa]">Target Safe Limit:</span>
+              <span id="ac-daily-target" class="font-semibold text-[#047857] dark:text-[#34d399]">4.5 Units / Day</span>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-[#e0e0e0] dark:border-[#3f3f46]">
+              <span class="text-[#707070] dark:text-[#a1a1aa]">Projected Run-out:</span>
+              <span id="ac-exhaustion-date" class="font-semibold text-[#141414] dark:text-white">April 2027 (Safe)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-5 border-t border-[#e0e0e0] dark:border-[#27272a]">
+          <button 
+            id="btn-log-ac-reading"
+            class="pill-primary w-full py-3"
+          >
+            <span>Log Meter Reading</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Seasonal Month-Wise Budgeting -->
+      <div class="lg:col-span-2 card-mobbin-soft p-6 sm:p-8 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-heading text-xl text-[#141414] dark:text-white">Seasonal Month-Wise Unit Budget</h3>
+              <p class="font-caption text-xs text-[#707070] dark:text-[#a1a1aa]">Plan unit allowances for hot summer months vs pleasant winter months</p>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold card-inner-well">Customizable</span>
+          </div>
+
+          <!-- Monthly Allocation Tiles -->
+          <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+            <div class="p-4 rounded-2xl card-inner-well space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-[#141414] dark:text-white">August (Monsoon)</span>
+                <span class="text-[#0066ff] dark:text-[#60a5fa]">120 U</span>
+              </div>
+              <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Actual used: 32 U</div>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-[#141414] dark:text-white">September (Current)</span>
+                <span class="text-[#0066ff] dark:text-[#60a5fa]">140 U</span>
+              </div>
+              <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Actual used: 29 U</div>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-[#141414] dark:text-white">October (Pleasant)</span>
+                <span class="text-[#0066ff] dark:text-[#60a5fa]">100 U</span>
+              </div>
+              <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Planned: 100 U</div>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-[#141414] dark:text-white">Nov - Jan (Winter)</span>
+                <span class="text-[#0066ff] dark:text-[#60a5fa]">50 U Total</span>
+              </div>
+              <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">AC Rarely Needed</div>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-[#141414] dark:text-white">Feb - Mar (Spring)</span>
+                <span class="text-[#0066ff] dark:text-[#60a5fa]">140 U</span>
+              </div>
+              <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Planned</div>
+            </div>
+
+            <div class="p-4 rounded-2xl card-inner-well space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-[#141414] dark:text-white">Apr - May (Peak Heat)</span>
+                <span class="text-[#0066ff] dark:text-[#60a5fa]">450 U</span>
+              </div>
+              <div class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Heavy Season</div>
+            </div>
+          </div>
+
+          <!-- Best Practice Note -->
+          <div class="mt-5 p-4 rounded-2xl card-inner-well text-xs">
+            <div class="font-semibold text-[#141414] dark:text-white">Hostel AC Efficiency Guide:</div>
+            <p class="text-[#707070] dark:text-[#a1a1aa] mt-1 leading-relaxed">
+              Setting the AC to 24°C - 26°C with Timer mode (3 hours at night) saves up to 35% electricity compared to running at 18°C all night, ensuring your 1000 units lasts the full academic year.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-[#e0e0e0] dark:border-[#27272a] flex items-center justify-between text-xs text-[#707070] dark:text-[#a1a1aa]">
+          <span>Readings Log: <strong class="text-[#141414] dark:text-white">3 recorded</strong></span>
+          <span class="text-[#047857] dark:text-[#34d399] font-semibold">Meter active</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 1: Add Cloth Category Modal (100% Opaque solid background) -->
+<div id="modal-add-cloth" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <h3 class="font-heading text-lg text-[#09090b] dark:text-white">Add Wardrobe Category</h3>
+      <button id="btn-close-cloth-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <form id="form-add-cloth" class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Category Name</label>
+        <input 
+          type="text" 
+          id="cloth-input-name" 
+          required 
+          placeholder="e.g. College Blazer / Hoodies" 
+          class="field-input w-full text-xs"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Color / Tag</label>
+          <input 
+            type="text" 
+            id="cloth-input-color" 
+            placeholder="e.g. Black / Grey" 
+            class="field-input w-full text-xs"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Type</label>
+          <select id="cloth-input-type" class="field-input w-full text-xs">
+            <option value="casual">Casual Wear</option>
+            <option value="uniform">College Uniform</option>
+            <option value="lab">Lab Coat / Apron</option>
+            <option value="bedding">Bedding & Towels</option>
+            <option value="innerwear">Innerwear</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Initial Clean Count</label>
+          <input 
+            type="number" 
+            id="cloth-input-clean" 
+            min="0" 
+            value="3" 
+            required 
+            class="field-input w-full text-xs"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Initial Dirty Count</label>
+          <input 
+            type="number" 
+            id="cloth-input-dirty" 
+            min="0" 
+            value="0" 
+            required 
+            class="field-input w-full text-xs"
+          />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4 border-t border-[#e4e4e7] dark:border-[#27272a]">
+        <button type="button" id="btn-cancel-cloth" class="pill-soft text-xs">Cancel</button>
+        <button type="submit" class="pill-primary text-xs">Save Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal 2: Log AC Meter Reading (100% Opaque solid background) -->
+<div id="modal-ac-reading" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <h3 class="font-heading text-lg text-[#09090b] dark:text-white">Log AC Meter Reading</h3>
+      <button id="btn-close-ac-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <form id="form-ac-reading" class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Total Units Consumed on Meter</label>
+        <input 
+          type="number" 
+          id="ac-input-reading" 
+          min="0" 
+          max="1000" 
+          required 
+          value="61" 
+          class="field-input w-full font-bold text-sm"
+        />
+        <span class="text-[11px] text-[#71717a] dark:text-[#a1a1aa] mt-1.5 block">Current recorded is 61 units out of 1000 total quota.</span>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Date of Reading</label>
+        <input 
+          type="date" 
+          id="ac-input-date" 
+          required 
+          class="field-input w-full text-xs"
+        />
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4 border-t border-[#e4e4e7] dark:border-[#27272a]">
+        <button type="button" id="btn-cancel-ac" class="pill-soft text-xs">Cancel</button>
+        <button type="submit" class="pill-primary text-xs">Update Meter</button>
+      </div>
+    </form>
+  </div>
+</div>
