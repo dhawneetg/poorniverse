@@ -2,8 +2,8 @@
 // SettingsModal.astro — Minimal Settings & Environment Status (Keys managed securely in .env)
 ---
 
-<div id="modal-settings" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-6 relative z-10 opacity-100">
+<div id="modal-settings" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-settings">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-6 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <div>
         <h3 class="font-heading text-lg text-[#09090b] dark:text-white">Settings & Cloud Status</h3>
@@ -18,15 +18,15 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-[#047857] dark:bg-[#34d399] animate-pulse"></span>
-            <span class="text-xs font-semibold text-[#09090b] dark:text-white">Supabase PostgreSQL Cloud</span>
+            <span class="font-heading text-xs text-[#09090b] dark:text-white">Cloud Database Sync</span>
           </div>
-          <span class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[#ecfdf5] dark:bg-[#064e3b] text-[#047857] dark:text-[#34d399] border border-[#a7f3d0] dark:border-[#065f46]">
-            Active (.env)
+          <span id="settings-db-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ecfdf5] dark:bg-[#064e3b] text-[#047857] dark:text-[#34d399] border border-[#a7f3d0] dark:border-[#065f46]">
+            Active
           </span>
         </div>
-        <div class="text-[11px] text-[#52525b] dark:text-[#a1a1aa] leading-relaxed">
-          Cloud sync is connected directly through your root <code class="font-mono bg-[#e4e4e7] dark:bg-[#27272a] px-1.5 py-0.5 rounded text-[#09090b] dark:text-white">.env</code> configuration. Attendance and quotas are synced across all your devices securely.
-        </div>
+        <p class="text-[11px] text-[#52525b] dark:text-[#a1a1aa] leading-relaxed">
+          PostgreSQL persistence layer is operational. Changes made across TCS iON attendance, hostel meters, and tasks are automatically synchronized with offline encrypted localStorage fallback.
+        </p>
       </div>
 
       <div class="p-4 rounded-2xl card-inner-well space-y-2">

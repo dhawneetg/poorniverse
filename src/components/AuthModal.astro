@@ -2,8 +2,8 @@
 // AuthModal.astro — Supabase Authentication & Google OAuth (Dark & Light Mode)
 ---
 
-<div id="modal-auth" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-6 sm:p-8 shadow-2xl space-y-6 relative z-10 opacity-100">
+<div id="modal-auth" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-auth">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-6 sm:p-8 shadow-2xl space-y-6 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <!-- Header with Segmented Switcher -->
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <div class="inline-flex p-1 bg-[#f3f3f3] dark:bg-[#27272a] rounded-full border border-[#e0e0e0] dark:border-[#3f3f46]">

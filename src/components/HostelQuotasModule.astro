@@ -369,9 +369,9 @@
   </div>
 </div>
 
-<!-- Modal 1: Add Cloth Category Modal (100% Opaque solid background) -->
-<div id="modal-add-cloth" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+<!-- Modal 1: Add Cloth Category Modal -->
+<div id="modal-add-cloth" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-add-cloth">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <h3 class="font-heading text-lg text-[#09090b] dark:text-white">Add Wardrobe Category</h3>
       <button id="btn-close-cloth-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
@@ -444,9 +444,9 @@
   </div>
 </div>
 
-<!-- Modal 2: Log AC Meter Reading (100% Opaque solid background) -->
-<div id="modal-ac-reading" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+<!-- Modal 2: Log AC Meter Reading -->
+<div id="modal-ac-reading" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-ac-reading">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <h3 class="font-heading text-lg text-[#09090b] dark:text-white">Log AC Meter Reading</h3>
       <button id="btn-close-ac-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
@@ -461,10 +461,10 @@
           min="0" 
           max="1000" 
           required 
-          value="61" 
+          placeholder="0" 
           class="field-input w-full font-bold text-sm"
         />
-        <span class="text-[11px] text-[#71717a] dark:text-[#a1a1aa] mt-1.5 block">Current recorded is 61 units out of 1000 total quota.</span>
+        <span class="text-[11px] text-[#71717a] dark:text-[#a1a1aa] mt-1.5 block">Record your current sub-meter reading out of 1000 total quota.</span>
       </div>
 
       <div>

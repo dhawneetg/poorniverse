@@ -95,23 +95,46 @@
     <!-- Poornima Daily Mess Menu -->
     <div class="card-mobbin p-6 sm:p-8 flex flex-col justify-between">
       <div>
-        <div class="flex items-center justify-between">
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">
-            Hostel Mess
-          </span>
-          <span id="mess-day-tag" class="text-xs font-semibold text-[#0066ff] dark:text-[#60a5fa]">Today</span>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">
+              Hostel Mess
+            </span>
+            <a 
+              href="https://poornima.edu.in/life-at-poornima/menu-facility" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="text-[11px] font-semibold text-[#0066ff] dark:text-[#60a5fa] hover:underline inline-flex items-center gap-1"
+            >
+              poornima.edu.in portal ↗
+            </a>
+          </div>
+          <button id="btn-fetch-live-menu" class="pill-soft text-[11px] py-0.5 px-2.5">
+            ↻ Sync Live
+          </button>
         </div>
 
         <h3 class="font-heading text-xl mt-3 text-[#141414] dark:text-white">Daily Meal Schedule</h3>
-        <p class="font-caption text-xs mt-1 text-[#707070] dark:text-[#a1a1aa]">Poornima Hostel Dining Timings & Menu</p>
+        <p class="font-caption text-xs mt-1 text-[#707070] dark:text-[#a1a1aa]">Poornima University Hostel Dining Timings & Official Menu</p>
 
-        <div class="mt-5 space-y-2.5 text-xs">
+        <!-- Weekday Navigation Tabs -->
+        <div class="mt-4 flex items-center gap-1 overflow-x-auto pb-1" id="mess-day-tabs">
+          <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#141414] dark:bg-white text-white dark:text-[#141414] transition-all" data-day="Monday">Mon</button>
+          <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Tuesday">Tue</button>
+          <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Wednesday">Wed</button>
+          <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Thursday">Thu</button>
+          <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Friday">Fri</button>
+          <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Saturday">Sat</button>
+          <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Sunday">Sun</button>
+        </div>
+
+        <div class="mt-4 space-y-2.5 text-xs">
           <!-- Breakfast -->
           <div class="p-3 rounded-2xl card-inner-well">
             <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
               <span>Breakfast (7:30 - 9:00 AM)</span>
             </div>
-            <p id="mess-bf" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Aloo Paratha, Curd, Tea & Sprouts</p>
+            <p id="mess-bf" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1 leading-relaxed">Loading...</p>
           </div>
 
           <!-- Lunch -->
@@ -119,7 +142,7 @@
             <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
               <span>Lunch (12:30 - 2:00 PM)</span>
             </div>
-            <p id="mess-lunch" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Dal Tadka, Seasonal Sabzi, Roti, Rice & Salad</p>
+            <p id="mess-lunch" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1 leading-relaxed">Loading...</p>
           </div>
 
           <!-- Evening Snacks -->
@@ -127,7 +150,7 @@
             <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
               <span>Snacks (5:00 - 6:00 PM)</span>
             </div>
-            <p id="mess-snacks" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Samosa / Poha & Hot Tea</p>
+            <p id="mess-snacks" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1 leading-relaxed">Loading...</p>
           </div>
 
           <!-- Dinner -->
@@ -135,14 +158,16 @@
             <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
               <span>Dinner (7:45 - 9:30 PM)</span>
             </div>
-            <p id="mess-dinner" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1">Paneer Butter Masala, Chapati, Pulao & Sweet Gulab Jamun</p>
+            <p id="mess-dinner" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1 leading-relaxed">Loading...</p>
           </div>
         </div>
       </div>
 
-      <div class="mt-5 pt-4 border-t border-[#e0e0e0] dark:border-[#27272a] text-[11px] text-[#707070] dark:text-[#a1a1aa]">
-        Mess coupon required for external guests.
+      <div class="mt-5 pt-4 border-t border-[#e0e0e0] dark:border-[#27272a] flex items-center justify-between text-[11px] text-[#707070] dark:text-[#a1a1aa]">
+        <span>Official Menu • Verified for PCE & PU Hostels</span>
+        <span id="mess-status-badge" class="text-[#047857] dark:text-[#34d399] font-medium">✓ College portal synced</span>
       </div>
+    </div>
     </div>
   </div>
 

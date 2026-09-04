@@ -8,40 +8,32 @@ import type {
   MessDayMenu,
 } from './types';
 
-// Default initial state representing Poornima University / College student context
+// Clean initial state representing real Poornima student workspace (no fake records)
 export const DEFAULT_LAUNDRY: LaundryConfig = {
   totalTokens: 60,
-  usedTokens: 6,
-  targetMonths: 5, // user wants to customize e.g. 5 months
-  startDate: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().split('T')[0],
+  usedTokens: 0,
+  targetMonths: 5,
+  startDate: new Date().toISOString().split('T')[0],
   washBatchSizeThreshold: 10,
-  history: [
-    { id: 'l-1', date: '2026-08-10', itemsCount: 12, notes: 'College uniforms + Bedding' },
-    { id: 'l-2', date: '2026-08-20', itemsCount: 9, notes: 'Casual tees + Jeans' },
-    { id: 'l-3', date: '2026-08-30', itemsCount: 11, notes: 'Full batch' },
-  ],
+  history: [],
 };
 
 export const DEFAULT_CLOTHES: ClothCategory[] = [
-  { id: 'c-1', name: 'Poornima Uniform Shirts', icon: '👔', cleanCount: 3, dirtyCount: 2, inLaundryCount: 0, type: 'uniform', color: 'White / Sky Blue' },
-  { id: 'c-2', name: 'Uniform Trousers', icon: '👖', cleanCount: 2, dirtyCount: 1, inLaundryCount: 0, type: 'uniform', color: 'Navy Blue / Grey' },
-  { id: 'c-3', name: 'Casual T-Shirts', icon: '👕', cleanCount: 6, dirtyCount: 4, inLaundryCount: 0, type: 'casual', color: 'Assorted' },
-  { id: 'c-4', name: 'Jeans & Cargo Pants', icon: '👖', cleanCount: 4, dirtyCount: 1, inLaundryCount: 0, type: 'casual', color: 'Black/Blue' },
-  { id: 'c-5', name: 'Lab Coat / Apron', icon: '🥼', cleanCount: 1, dirtyCount: 0, inLaundryCount: 0, type: 'lab', color: 'White' },
-  { id: 'c-6', name: 'Innerwear & Socks Pairs', icon: '🧦', cleanCount: 7, dirtyCount: 3, inLaundryCount: 0, type: 'innerwear', color: 'Mixed' },
-  { id: 'c-7', name: 'Bedsheets & Towels', icon: '🛏️', cleanCount: 2, dirtyCount: 1, inLaundryCount: 0, type: 'bedding', color: 'Patterned' },
+  { id: 'c-1', name: 'Poornima Uniform Shirts', icon: '👔', cleanCount: 0, dirtyCount: 0, inLaundryCount: 0, type: 'uniform', color: 'White / Sky Blue' },
+  { id: 'c-2', name: 'Uniform Trousers', icon: '👖', cleanCount: 0, dirtyCount: 0, inLaundryCount: 0, type: 'uniform', color: 'Navy Blue / Grey' },
+  { id: 'c-3', name: 'Casual T-Shirts', icon: '👕', cleanCount: 0, dirtyCount: 0, inLaundryCount: 0, type: 'casual', color: 'Assorted' },
+  { id: 'c-4', name: 'Jeans & Pants', icon: '👖', cleanCount: 0, dirtyCount: 0, inLaundryCount: 0, type: 'casual', color: 'Black/Blue' },
+  { id: 'c-5', name: 'Lab Coat / Apron', icon: '🥼', cleanCount: 0, dirtyCount: 0, inLaundryCount: 0, type: 'lab', color: 'White' },
+  { id: 'c-6', name: 'Innerwear & Socks Pairs', icon: '🧦', cleanCount: 0, dirtyCount: 0, inLaundryCount: 0, type: 'innerwear', color: 'Mixed' },
+  { id: 'c-7', name: 'Bedsheets & Towels', icon: '🛏️', cleanCount: 0, dirtyCount: 0, inLaundryCount: 0, type: 'bedding', color: 'Patterned' },
 ];
 
 export const DEFAULT_AC: ACConfig = {
   totalUnits: 1000,
-  usedUnits: 61, // exactly 61 unit used as user mentioned
+  usedUnits: 0,
   targetMonths: 6,
   targetDailyLimit: 4.5,
-  readings: [
-    { id: 'ac-1', date: '2026-08-01', meterReading: 1000, consumedSinceLast: 0 },
-    { id: 'ac-2', date: '2026-08-15', meterReading: 1032, consumedSinceLast: 32 },
-    { id: 'ac-3', date: '2026-09-01', meterReading: 1061, consumedSinceLast: 29 },
-  ],
+  readings: [],
   monthlyBudgets: {
     'August': 120,
     'September': 140,
@@ -52,30 +44,68 @@ export const DEFAULT_AC: ACConfig = {
   },
 };
 
-export const DEFAULT_ATTENDANCE: AttendanceSubject[] = [
-  { id: 'sub-1', code: 'CS301', name: 'Data Structures & Algorithms', attended: 28, total: 32, type: 'Lecture', faculty: 'Dr. Sharma' },
-  { id: 'sub-2', code: 'CS302', name: 'Database Management Systems', attended: 22, total: 28, type: 'Lecture', faculty: 'Prof. Verma' },
-  { id: 'sub-3', code: 'CS303', name: 'Operating Systems', attended: 19, total: 27, type: 'Lecture', faculty: 'Dr. Gupta' }, // below 75%
-  { id: 'sub-4', code: 'CS304', name: 'Computer Networks', attended: 26, total: 30, type: 'Lecture', faculty: 'Prof. Joshi' },
-  { id: 'sub-5', code: 'CS305L', name: 'DSA Lab & Practice', attended: 11, total: 12, type: 'Lab', faculty: 'Er. Rathore' },
-  { id: 'sub-6', code: 'CS306L', name: 'DBMS Lab', attended: 10, total: 10, type: 'Lab', faculty: 'Er. Choudhary' },
-];
+export const DEFAULT_ATTENDANCE: AttendanceSubject[] = [];
 
-export const DEFAULT_TODOS: TodoItem[] = [
-  { id: 't-1', title: 'Submit DSA Graph Assignment on LMS', category: 'Assignment', priority: 'high', dueDate: '2026-09-05', completed: false, notes: 'Problems 1 to 5 from Tutorial Sheet' },
-  { id: 't-2', title: 'Complete DBMS Lab Record Experiment 4 & 5', category: 'Lab Record', priority: 'high', dueDate: '2026-09-06', completed: false, notes: 'Need signatures from faculty' },
-  { id: 't-3', title: 'Give clothes to laundry (Quota check: Batch ready)', category: 'Chores', priority: 'medium', dueDate: '2026-09-04', completed: false, notes: '8 items accumulated' },
-  { id: 't-4', title: 'Prepare for OS Mid-Term 1 (Process Scheduling)', category: 'Exam', priority: 'high', dueDate: '2026-09-15', completed: false, notes: 'Read Silberschatz Chapter 3 & 4' },
-];
+export const DEFAULT_TODOS: TodoItem[] = [];
 
+// Official Poornima Hostel Mess Menu from https://poornima.edu.in/life-at-poornima/menu-facility
 export const DEFAULT_MESS_MENU: MessDayMenu[] = [
-  { day: 'Monday', breakfast: 'Aloo Paratha, Curd, Tea/Coffee', lunch: 'Rajma, Rice, Roti, Seasonal Veg, Salad', snacks: 'Veg Cutlet, Tea', dinner: 'Kadhai Paneer, Dal Fry, Roti, Gulab Jamun', rating: 4 },
-  { day: 'Tuesday', breakfast: 'Poha, Jalebi, Sprouts, Milk/Tea', lunch: 'Kadi Pakora, Jeera Rice, Chapati, Aloo Jeera', snacks: 'Samosa, Green Chutney, Chai', dinner: 'Mix Veg, Dal Tadka, Roti, Rice, Kheer', rating: 3.5 },
-  { day: 'Wednesday', breakfast: 'Idli Sambhar, Coconut Chutney, Tea', lunch: 'Chole, Bhature/Puri, Rice, Raita', snacks: 'Bread Pakora, Tea', dinner: 'Dum Aloo, Dal Makhani, Butter Naan/Roti, Ice Cream', rating: 4.5 },
-  { day: 'Thursday', breakfast: 'Uttapam, Sambhar, Tea', lunch: 'Dal Panchmel, Baati, Churma (Rajasthani Special)', snacks: 'Patties, Cold Drink / Tea', dinner: 'Egg Curry / Shahi Paneer, Rice, Roti, Halwa', rating: 5 },
-  { day: 'Friday', breakfast: 'Methi Paratha, Butter, Dahi, Tea', lunch: 'Lobia, Rice, Bhindi Masala, Chapati', snacks: 'Pasta / Chowmein, Tea', dinner: 'Matar Paneer, Dal Arhar, Jeera Rice, Rasgulla', rating: 4 },
-  { day: 'Saturday', breakfast: 'Pav Bhaji / Sandwich, Tea', lunch: 'Veg Biryani, Boondi Raita, Papad, Chana Dal', snacks: 'Maggi / Sweet Corn, Coffee', dinner: 'Sev Tamatar, Yellow Dal, Chapati, Rice, Custard', rating: 4 },
-  { day: 'Sunday', breakfast: 'Poori Bhaji, Halwa, Milk/Tea', lunch: 'Paneer Butter Masala, Pulao, Missi Roti', snacks: 'Biscuit / Cookies, Evening Tea', dinner: 'Special Sunday Feast & Sweet', rating: 4.8 },
+  { 
+    day: 'Monday', 
+    breakfast: 'Sada Paratha + Mirch Achar, Bread Butter, Tea, Hot Milk', 
+    lunch: 'Aloo Chhole, Dal, Kaddu, Plain Rice, Rayta, Chapati, Achar, Salad', 
+    snacks: 'Dal Kachori / Veg Sandwich, Tea', 
+    dinner: 'Aloo Tamatar / Aloo Mangodi, Dal, Karela, Plain Rice, Curd, Chapati, Achar, Salad', 
+    rating: 4.2 
+  },
+  { 
+    day: 'Tuesday', 
+    breakfast: 'Veg Upma / Poha + Sev Namkeen, Bread Butter, Tea, Hot Milk', 
+    lunch: 'Rajma, Dal, Turai / Tinda, Rayta, Plain Rice, Chapati, Achar, Salad', 
+    snacks: 'Samosa / Aloo Patties, Tea', 
+    dinner: 'Shahi Paneer, Dal, Loki / Phool Gobi, Plain Rice, Curd, Chapati, Achar, Salad', 
+    rating: 4.5 
+  },
+  { 
+    day: 'Wednesday', 
+    breakfast: 'Idli Sambhar + Coconut Chutney, Bread Butter, Tea, Hot Milk', 
+    lunch: 'Dahi Aloo, Dal, Patta Gobi, Plain Rice, Rayta, Chapati, Achar, Salad', 
+    snacks: 'Bhelpuri + Chutney / Sandwich, Tea', 
+    dinner: 'Kala Chana / Paneer, Dal, Gilodi, Plain Rice, Curd, Chapati, Achar, Salad', 
+    rating: 4.3 
+  },
+  { 
+    day: 'Thursday', 
+    breakfast: 'Mix Paratha, Bread Butter, Thandai, Tea', 
+    lunch: 'Dal, Patta Gobi, Kala Chana, Rayta, Chapati, Salad, Achar', 
+    snacks: 'Bhelpuri, Tea', 
+    dinner: 'Dal, Corn Palak, Razma, Plain Rice, Chapati, Dahi, Salad', 
+    rating: 4.8 
+  },
+  { 
+    day: 'Friday', 
+    breakfast: 'Pav Bhaji / Poha, Bread Butter, Tea, Hot Milk', 
+    lunch: 'Besan Gatta Masala / Chana Dal, Bhindi, Plain Rice, Rayta, Chapati, Salad, Achar', 
+    snacks: 'Sabudana Khichdi / Veg Pasta, Tea', 
+    dinner: 'Dal, Pyaz Matar, Soyabean, Plain Rice, Curd, Chapati, Dahi, Salad', 
+    rating: 4.4 
+  },
+  { 
+    day: 'Saturday', 
+    breakfast: 'Poori Aloo Bhaji, Bread Butter, Tea, Hot Milk', 
+    lunch: 'Dal, Dahi Loki, Chhola, Rayta, Plain Rice, Chapati, Salad, Achar', 
+    snacks: 'Dal Pakodi / Sambar Vada, Tea', 
+    dinner: 'Kadhi, Patta Gobi, Chivda, Pila Pulao, Chapati, Dahi, Salad', 
+    rating: 4.6 
+  },
+  { 
+    day: 'Sunday', 
+    breakfast: 'Mix Paratha / Aloo Paratha Masala, Bread Butter, Thandai, Tea', 
+    lunch: 'Dal, Sukhe Aloo, Rayta, Matar Pulao, Chapati, Sevdi, Papad, Salad, Achar', 
+    snacks: 'Poha, Tea', 
+    dinner: 'Malai Kofta / Paneer, Dal, Plain Rice, Chapati, Dahi, Salad, Kheer / Gulab Jamun', 
+    rating: 5.0 
+  },
 ];
 
 // Helper to load and save with LocalStorage

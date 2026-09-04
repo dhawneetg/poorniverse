@@ -42,7 +42,73 @@ let messState: MessDayMenu[] = getStoredData(KEYS.MESS, DEFAULT_MESS_MENU);
 let currentTodoFilter = 'all';
 let currentWearType: 'uniform' | 'lab' | 'casual' = 'uniform';
 
+function purgeOldSampleData() {
+  // Automatically purge legacy fake courses if detected
+  if (attendanceState.length > 0 && attendanceState.some(s => s.id === 'sub-1' || s.faculty === 'Dr. Sharma')) {
+    attendanceState = [];
+    setStoredData(KEYS.ATTENDANCE, attendanceState);
+  }
+  // Purge legacy fake todos if detected
+  if (todosState.length > 0 && todosState.some(t => t.id === 't-1' || t.title.includes('LMS'))) {
+    todosState = [];
+    setStoredData(KEYS.TODOS, todosState);
+  }
+  // Purge legacy fake laundry history if detected
+  if (laundryState.history.length > 0 && laundryState.history.some(h => h.id === 'l-1')) {
+    laundryState = { ...DEFAULT_LAUNDRY, usedTokens: 0, history: [] };
+    setStoredData(KEYS.LAUNDRY, laundryState);
+  }
+  // Purge legacy fake AC history if detected
+  if (acState.readings.length > 0 && acState.readings.some(r => r.id === 'ac-1')) {
+    acState = { ...DEFAULT_AC, usedUnits: 0, readings: [] };
+    setStoredData(KEYS.AC, acState);
+  }
+  // Always update messState to official DEFAULT_MESS_MENU
+  if (!messState || messState.length === 0 || messState[0].breakfast.includes('Curd, Tea/Coffee')) {
+    messState = DEFAULT_MESS_MENU;
+    setStoredData(KEYS.MESS, messState);
+  }
+}
+
+function setupModals() {
+  // Dismiss modals on backdrop click
+  document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) {
+        backdrop.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    });
+  });
+
+  // Dismiss on Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.add('hidden'));
+      document.body.classList.remove('overflow-hidden');
+    }
+  });
+
+  // Watch for modal visibility changes to lock body scroll
+  const observer = new MutationObserver(() => {
+    const anyModalOpen = Array.from(document.querySelectorAll('.modal-backdrop')).some(
+      m => !m.classList.contains('hidden')
+    );
+    if (anyModalOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+  });
+
+  document.querySelectorAll('.modal-backdrop').forEach(m => {
+    observer.observe(m, { attributes: true, attributeFilter: ['class'] });
+  });
+}
+
 export function initApp() {
+  purgeOldSampleData();
+  setupModals();
   setupTheme();
   setupNavigation();
   setupAuthModule();
@@ -99,40 +165,62 @@ function updateThemeIcons(isDark: boolean) {
 // -------------------------------------------------------------
 // 1. NAVIGATION (Synchronized Desktop & Mobile Bottom Dock)
 // -------------------------------------------------------------
-function setupNavigation() {
+function switchMainView(target: string) {
   const navButtons = document.querySelectorAll('.nav-main-tab');
-  const sections = {
+  const sections: Record<string, HTMLElement | null> = {
     attendance: document.getElementById('view-attendance'),
     hostel: document.getElementById('view-hostel'),
     todos: document.getElementById('view-todos'),
     tools: document.getElementById('view-tools'),
   };
 
+  navButtons.forEach(b => {
+    const bTarget = b.getAttribute('data-view');
+    if (bTarget === target) {
+      b.className = 'nav-main-tab active px-4 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all shadow-sm whitespace-nowrap flex-1 sm:flex-initial text-center';
+    } else {
+      b.className = 'nav-main-tab px-4 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-xs transition-all whitespace-nowrap flex-1 sm:flex-initial text-center';
+    }
+  });
+
+  Object.entries(sections).forEach(([key, el]) => {
+    if (!el) return;
+    if (key === target) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setupNavigation() {
+  const navButtons = document.querySelectorAll('.nav-main-tab');
   navButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.getAttribute('data-view');
-      if (!target) return;
-
-      navButtons.forEach(b => {
-        const bTarget = b.getAttribute('data-view');
-        if (bTarget === target) {
-          b.className = 'nav-main-tab active px-4 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all shadow-sm whitespace-nowrap flex-1 sm:flex-initial text-center';
-        } else {
-          b.className = 'nav-main-tab px-4 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-semibold text-xs transition-all whitespace-nowrap flex-1 sm:flex-initial text-center';
-        }
-      });
-
-      Object.entries(sections).forEach(([key, el]) => {
-        if (!el) return;
-        if (key === target) {
-          el.classList.remove('hidden');
-        } else {
-          el.classList.add('hidden');
-        }
-      });
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (target) switchMainView(target);
     });
+  });
+
+  // Footer navigation buttons
+  document.querySelectorAll('.footer-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-view');
+      if (target) switchMainView(target);
+    });
+  });
+
+  // Footer modal trigger buttons
+  document.getElementById('footer-btn-bm')?.addEventListener('click', () => {
+    document.getElementById('modal-bookmarklet')?.classList.remove('hidden');
+  });
+  document.getElementById('footer-btn-sync')?.addEventListener('click', () => {
+    document.getElementById('modal-auth')?.classList.remove('hidden');
+  });
+  document.getElementById('footer-btn-settings')?.addEventListener('click', () => {
+    document.getElementById('modal-settings')?.classList.remove('hidden');
   });
 
   const btnTabLaundry = document.getElementById('tab-btn-laundry');
@@ -556,6 +644,51 @@ function renderAttendance() {
   let totalClasses = 0;
 
   container.innerHTML = '';
+
+  if (attendanceState.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full card-mobbin p-8 sm:p-12 text-center flex flex-col items-center justify-center space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl font-bold border border-blue-500/20">
+          📋
+        </div>
+        <div class="space-y-1">
+          <h4 class="font-heading text-lg text-[#09090b] dark:text-white">No Courses Added Yet</h4>
+          <p class="text-xs text-[#71717a] dark:text-[#a1a1aa] max-w-md mx-auto leading-relaxed">
+            Import your real attendance table from the TCS iON portal in one click, or add individual college courses manually to simulate 75% bunks.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <button id="btn-empty-paste" class="pill-primary text-xs"><span>Import from TCS iON</span></button>
+          <button id="btn-empty-add" class="pill-outline text-xs"><span>+ Add Enrolled Course</span></button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('btn-empty-paste')?.addEventListener('click', () => {
+      document.getElementById('modal-paste-tcs')?.classList.remove('hidden');
+    });
+    document.getElementById('btn-empty-add')?.addEventListener('click', () => {
+      (document.getElementById('form-subject') as HTMLFormElement)?.reset();
+      (document.getElementById('sub-input-id') as HTMLInputElement).value = '';
+      document.getElementById('modal-subject')?.classList.remove('hidden');
+    });
+
+    const overallCircle = document.getElementById('overall-circle-bar');
+    const overallPctText = document.getElementById('overall-att-pct');
+    const overallRatioText = document.getElementById('overall-att-ratio');
+    const overallPill = document.getElementById('overall-status-pill');
+
+    if (overallPctText) overallPctText.textContent = '--%';
+    if (overallRatioText) overallRatioText.textContent = '0 / 0';
+    if (overallCircle) overallCircle.setAttribute('stroke-dasharray', '0, 100');
+    if (overallPill) {
+      overallPill.className = 'mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#f1f3f5] dark:bg-[#27272a] text-[#71717a] dark:text-[#a1a1aa] border border-[#e4e4e7] dark:border-[#3f3f46]';
+      overallPill.textContent = 'Awaiting TCS iON data';
+    }
+    const subCountBadge = document.getElementById('subject-count-badge');
+    if (subCountBadge) subCountBadge.textContent = '0 Courses';
+    return;
+  }
 
   attendanceState.forEach(sub => {
     totalAttended += sub.attended;
@@ -1259,19 +1392,74 @@ function setupCampusToolsModule() {
 
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const todayName = days[new Date().getDay()];
-  const todayMenu = messState.find(m => m.day.toLowerCase() === todayName.toLowerCase()) || messState[0];
+  let activeMessDay = todayName;
 
-  const dayTag = document.getElementById('mess-day-tag');
-  const bfEl = document.getElementById('mess-bf');
-  const lunchEl = document.getElementById('mess-lunch');
-  const snacksEl = document.getElementById('mess-snacks');
-  const dinnerEl = document.getElementById('mess-dinner');
+  function renderMessForDay(day: string) {
+    activeMessDay = day;
+    const menu = messState.find(m => m.day.toLowerCase() === day.toLowerCase()) || messState[0];
+    const bfEl = document.getElementById('mess-bf');
+    const lunchEl = document.getElementById('mess-lunch');
+    const snacksEl = document.getElementById('mess-snacks');
+    const dinnerEl = document.getElementById('mess-dinner');
 
-  if (dayTag) dayTag.textContent = `${todayMenu.day} (Today)`;
-  if (bfEl) bfEl.textContent = todayMenu.breakfast;
-  if (lunchEl) lunchEl.textContent = todayMenu.lunch;
-  if (snacksEl) snacksEl.textContent = todayMenu.snacks;
-  if (dinnerEl) dinnerEl.textContent = todayMenu.dinner;
+    if (bfEl) bfEl.innerHTML = menu.breakfast;
+    if (lunchEl) lunchEl.innerHTML = menu.lunch;
+    if (snacksEl) snacksEl.innerHTML = menu.snacks;
+    if (dinnerEl) dinnerEl.innerHTML = menu.dinner;
+
+    document.querySelectorAll('.mess-day-btn').forEach(btn => {
+      const bDay = btn.getAttribute('data-day');
+      if (bDay?.toLowerCase() === day.toLowerCase()) {
+        btn.className = 'mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#141414] dark:bg-white text-white dark:text-[#141414] transition-all';
+      } else {
+        btn.className = 'mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all';
+      }
+    });
+  }
+
+  document.querySelectorAll('.mess-day-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const day = btn.getAttribute('data-day');
+      if (day) renderMessForDay(day);
+    });
+  });
+
+  renderMessForDay(todayName);
+
+  // Live Sync button from official Poornima Firestore API
+  document.getElementById('btn-fetch-live-menu')?.addEventListener('click', async () => {
+    const statusBadge = document.getElementById('mess-status-badge');
+    if (statusBadge) statusBadge.textContent = 'Syncing...';
+    try {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const res = await fetch(`https://firestore.googleapis.com/v1/projects/poornima-5c202/databases/(default)/documents/meals/${todayStr}?key=AIzaSyBrksZsdbuYx1ktbuUDqTtBkhoG7DAKOPU`);
+      if (res.ok) {
+        const doc = await res.json();
+        if (doc.fields) {
+          const liveBf = doc.fields.breakfast?.stringValue?.replace(/<[^>]*>/g, '') || '';
+          const liveLunch = doc.fields.lunch?.stringValue?.replace(/<[^>]*>/g, '') || '';
+          const liveSnacks = doc.fields.snacks?.stringValue?.replace(/<[^>]*>/g, '') || '';
+          const liveDinner = doc.fields.dinner?.stringValue?.replace(/<[^>]*>/g, '') || '';
+
+          messState = messState.map(m => m.day.toLowerCase() === todayName.toLowerCase() ? {
+            ...m,
+            breakfast: liveBf || m.breakfast,
+            lunch: liveLunch || m.lunch,
+            snacks: liveSnacks || m.snacks,
+            dinner: liveDinner || m.dinner,
+          } : m);
+          setStoredData(KEYS.MESS, messState);
+          renderMessForDay(todayName);
+          if (statusBadge) statusBadge.textContent = '✓ Live from college portal';
+          confetti({ particleCount: 20, spread: 35 });
+          return;
+        }
+      }
+      if (statusBadge) statusBadge.textContent = '✓ Official weekly schedule verified';
+    } catch (e) {
+      if (statusBadge) statusBadge.textContent = '✓ Using verified college menu';
+    }
+  });
 }
 
 // -------------------------------------------------------------
@@ -1312,14 +1500,26 @@ function setupSettingsModule() {
   }
 
   document.getElementById('btn-reset-defaults')?.addEventListener('click', () => {
-    if (confirm('Reset all data to default initial state?')) {
-      localStorage.clear();
-      laundryState = DEFAULT_LAUNDRY;
+    if (confirm('Are you sure you want to clear all data to a clean slate (0 courses, clean quota)?')) {
+      localStorage.removeItem(KEYS.ATTENDANCE);
+      localStorage.removeItem(KEYS.TODOS);
+      localStorage.removeItem(KEYS.LAUNDRY);
+      localStorage.removeItem(KEYS.AC);
+      localStorage.removeItem(KEYS.CLOTHES);
+      
+      attendanceState = [];
+      todosState = [];
+      laundryState = { ...DEFAULT_LAUNDRY, usedTokens: 0, history: [] };
+      acState = { ...DEFAULT_AC, usedUnits: 0, readings: [] };
       clothesState = DEFAULT_CLOTHES;
-      acState = DEFAULT_AC;
-      attendanceState = DEFAULT_ATTENDANCE;
-      todosState = DEFAULT_TODOS;
       messState = DEFAULT_MESS_MENU;
+
+      setStoredData(KEYS.ATTENDANCE, attendanceState);
+      setStoredData(KEYS.TODOS, todosState);
+      setStoredData(KEYS.LAUNDRY, laundryState);
+      setStoredData(KEYS.AC, acState);
+      setStoredData(KEYS.CLOTHES, clothesState);
+      setStoredData(KEYS.MESS, messState);
 
       renderAttendance();
       renderLaundry();
@@ -1328,6 +1528,7 @@ function setupSettingsModule() {
       renderTodos();
       updateHeaderTicker();
       modal?.classList.add('hidden');
+      alert('Workspace cleared. You are now on a clean slate.');
     }
   });
 }

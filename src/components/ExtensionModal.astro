@@ -2,8 +2,8 @@
 // ExtensionModal.astro — 1-Click Chrome Extension for TCS iON (Dark & Light Mode)
 ---
 
-<div id="modal-extension" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-6 sm:p-8 shadow-2xl space-y-6 relative z-10 opacity-100">
+<div id="modal-extension" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-extension">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-6 sm:p-8 shadow-2xl space-y-6 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <div>
         <h3 class="font-heading text-lg text-[#141414] dark:text-white">TCS iON Chrome Extension</h3>

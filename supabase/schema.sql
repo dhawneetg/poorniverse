@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS public.academic_todos (
   user_id UUID REFERENCES auth.users ON DELETE CASCADE,
   title TEXT NOT NULL,
   category TEXT DEFAULT 'assignment',
-  priority TEXT DEFAULT 'medium',
+  pricosmic-chasmority TEXT DEFAULT 'medium',
   due_date DATE,
   is_completed BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()

@@ -50,8 +50,11 @@ import ExtensionModal from '../components/ExtensionModal.astro';
           <!-- Col 1: Institutional Monogram & Overview -->
           <div class="lg:col-span-2 space-y-4">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 squircle-tile bg-white dark:bg-[#27272a] text-[#141414] dark:text-white flex items-center justify-center font-heading text-sm font-bold">
-                P
+              <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 shadow-lg shadow-blue-500/20 border border-white/20 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 21V4h6.5a4.5 4.5 0 0 1 4.5 4.5v0a4.5 4.5 0 0 1-4.5 4.5H7" />
+                  <circle cx="13" cy="8.5" r="1.25" fill="currentColor" stroke="none" />
+                </svg>
               </div>
               <div>
                 <div class="font-heading text-base text-white">Poornima College of Engineering</div>
@@ -70,12 +73,12 @@ import ExtensionModal from '../components/ExtensionModal.astro';
           <div class="space-y-3">
             <h4 class="font-heading text-xs uppercase tracking-wider text-white">Academic Modules</h4>
             <ul class="space-y-2 text-xs text-[#adadad] dark:text-[#a1a1aa]">
-              <li><a href="#" class="hover:text-white transition-colors">TCS iON Attendance Engine</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">75% Safe Bunk Calculator</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Attendance Recovery Forecaster</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">SGPA & Internal Marks Target</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Course Timetable & Labs</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Previous Exam Question Bank</a></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="attendance">TCS iON Attendance Engine</button></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="attendance">75% Safe Bunk Calculator</button></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="attendance">Attendance Recovery Forecaster</button></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="tools">SGPA & Internal Marks Target</button></li>
+              <li><a href="https://pce.poornima.org/academics/time-table" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Course Timetable & Labs ↗</a></li>
+              <li><a href="https://lms.poornima.edu.in" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Previous Exam Question Bank ↗</a></li>
             </ul>
           </div>
 
@@ -83,12 +86,12 @@ import ExtensionModal from '../components/ExtensionModal.astro';
           <div class="space-y-3">
             <h4 class="font-heading text-xs uppercase tracking-wider text-white">Hostel & Amenities</h4>
             <ul class="space-y-2 text-xs text-[#adadad] dark:text-[#a1a1aa]">
-              <li><a href="#" class="hover:text-white transition-colors">60-Wash Laundry Token Budget</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">1000-Unit AC Consumption Meter</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Smart Dirty Cloth Accumulator</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Wardrobe & Outfit Suggester</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Daily Hostel Mess Schedule</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Canteen Delivery & Review</a></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="hostel">60-Wash Laundry Token Budget</button></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="hostel">1000-Unit AC Consumption Meter</button></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="hostel">Smart Dirty Cloth Accumulator</button></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="hostel">Wardrobe & Outfit Suggester</button></li>
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="tools">Daily Hostel Mess Schedule</button></li>
+              <li><a href="https://poornima.edu.in/life-at-poornima/menu-facility" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Official Mess Menu Facility ↗</a></li>
             </ul>
           </div>
 
@@ -96,11 +99,11 @@ import ExtensionModal from '../components/ExtensionModal.astro';
           <div class="space-y-3">
             <h4 class="font-heading text-xs uppercase tracking-wider text-white">Integrations & Tech</h4>
             <ul class="space-y-2 text-xs text-[#adadad] dark:text-[#a1a1aa]">
-              <li><a href="#" id="footer-btn-ext" class="hover:text-white transition-colors">Chrome Extension V3</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">1-Click TCS Bookmarklet</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Supabase PostgreSQL Bridge</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">LocalStorage Encrypted Cache</a></li>
-              <li><a href="#" id="footer-btn-backup" class="hover:text-white transition-colors">Export Full JSON Backup</a></li>
+              <li><button id="footer-btn-ext" class="hover:text-white transition-colors text-left">Chrome Extension V3</button></li>
+              <li><button id="footer-btn-bm" class="hover:text-white transition-colors text-left">1-Click TCS Bookmarklet</button></li>
+              <li><button id="footer-btn-sync" class="hover:text-white transition-colors text-left">Supabase PostgreSQL Bridge</button></li>
+              <li><button id="footer-btn-settings" class="hover:text-white transition-colors text-left">LocalStorage Encrypted Cache</button></li>
+              <li><button id="footer-btn-backup" class="hover:text-white transition-colors text-left">Export Full JSON Backup</button></li>
             </ul>
           </div>
         </div>
@@ -116,8 +119,9 @@ import ExtensionModal from '../components/ExtensionModal.astro';
           </div>
 
           <div class="flex items-center gap-5 text-[#adadad] dark:text-[#a1a1aa]">
-            <a href="https://www.tcsion.com" target="_blank" rel="noopener noreferrer" class="hover:text-white">TCS iON Portal ↗</a>
-            <a href="https://poornima.org" target="_blank" rel="noopener noreferrer" class="hover:text-white">Poornima PCE ↗</a>
+            <a href="https://www.tcsion.com/SelfServices/" target="_blank" rel="noopener noreferrer" class="hover:text-white">TCS iON Portal ↗</a>
+            <a href="https://pce.poornima.org" target="_blank" rel="noopener noreferrer" class="hover:text-white">Poornima PCE ↗</a>
+            <a href="https://poornima.edu.in/life-at-poornima/menu-facility" target="_blank" rel="noopener noreferrer" class="hover:text-white">Live Mess Menu ↗</a>
             <span class="text-[#707070] dark:text-[#71717a]">v2.5.0 Production</span>
           </div>
         </div>

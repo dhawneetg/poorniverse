@@ -35,7 +35,7 @@
               <path
                 id="overall-circle-bar"
                 class="text-[#047857] dark:text-[#10b981] transition-all duration-700"
-                stroke-dasharray="78, 100"
+                stroke-dasharray="0, 100"
                 stroke-width="3.5"
                 stroke-linecap="round"
                 stroke="currentColor"
@@ -44,14 +44,14 @@
               />
             </svg>
             <div class="absolute flex flex-col items-center">
-              <span id="overall-att-pct" class="text-lg font-heading text-[#09090b] dark:text-white">78.4%</span>
+              <span id="overall-att-pct" class="text-lg font-heading text-[#09090b] dark:text-white">--%</span>
             </div>
           </div>
           <div>
             <div class="text-xs text-[#71717a] dark:text-[#a1a1aa]">Total Attended</div>
-            <div id="overall-att-ratio" class="text-base font-bold text-[#09090b] dark:text-white">118 / 149</div>
-            <div id="overall-status-pill" class="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#ecfdf5] dark:bg-[#064e3b] text-[#047857] dark:text-[#34d399] border border-[#a7f3d0] dark:border-[#065f46]">
-              Above 75% Target
+            <div id="overall-att-ratio" class="text-base font-bold text-[#09090b] dark:text-white">0 / 0</div>
+            <div id="overall-status-pill" class="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#f1f3f5] dark:bg-[#27272a] text-[#71717a] dark:text-[#a1a1aa] border border-[#e4e4e7] dark:border-[#3f3f46]">
+              Awaiting TCS iON data
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <h3 class="font-heading text-xl text-[#09090b] dark:text-white">Enrolled Courses</h3>
-        <span id="subject-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#f1f3f5] dark:bg-[#27272a] text-[#52525b] dark:text-[#a1a1aa] border border-[#e4e4e7] dark:border-[#3f3f46]">6 Courses</span>
+        <span id="subject-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#f1f3f5] dark:bg-[#27272a] text-[#52525b] dark:text-[#a1a1aa] border border-[#e4e4e7] dark:border-[#3f3f46]">0 Courses</span>
       </div>
       <div class="text-xs text-[#71717a] dark:text-[#a1a1aa]">
         Use <span class="font-semibold text-[#09090b] dark:text-white">+ / -</span> to simulate hypothetical bunks or attended lectures
@@ -145,9 +145,9 @@
   </div>
 </div>
 
-<!-- Modal 1: Paste from TCS iON (100% Opaque solid background) -->
-<div id="modal-paste-tcs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+<!-- Modal 1: Paste from TCS iON -->
+<div id="modal-paste-tcs" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-paste-tcs">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-7 shadow-2xl space-y-4 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <h3 class="font-heading text-lg text-[#09090b] dark:text-white">Import from TCS iON</h3>
       <button id="btn-close-paste-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
@@ -186,9 +186,9 @@ CS303 Operating Systems	19	27	70.4%"
   </div>
 </div>
 
-<!-- Modal 2: 1-Click Bookmarklet Guide (100% Opaque solid background) -->
-<div id="modal-bookmarklet" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+<!-- Modal 2: 1-Click Bookmarklet Guide -->
+<div id="modal-bookmarklet" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-bookmarklet">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-7 shadow-2xl space-y-4 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <h3 class="font-heading text-lg text-[#09090b] dark:text-white">TCS iON Bookmarklet</h3>
       <button id="btn-close-bm-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
@@ -238,9 +238,9 @@ CS303 Operating Systems	19	27	70.4%"
   </div>
 </div>
 
-<!-- Modal 3: Add/Edit Subject Modal (100% OPAQUE SOLID CARD — NO BACKGROUND TEXT BLEED) -->
-<div id="modal-subject" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
-  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100">
+<!-- Modal 3: Add/Edit Subject Modal -->
+<div id="modal-subject" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-subject">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-7 shadow-2xl space-y-4 relative z-10 opacity-100" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
       <h3 id="modal-sub-title" class="font-heading text-lg text-[#09090b] dark:text-white">Add Enrolled Course</h3>
       <button id="btn-close-sub-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
@@ -255,14 +255,14 @@ CS303 Operating Systems	19	27	70.4%"
             type="text" 
             id="sub-input-code" 
             required 
-            placeholder="CS301" 
+            placeholder="e.g. CS301" 
             class="field-input col-span-1 text-xs"
           />
           <input 
             type="text" 
             id="sub-input-name" 
             required 
-            placeholder="Data Structures" 
+            placeholder="e.g. Data Structures" 
             class="field-input col-span-2 text-xs"
           />
         </div>
@@ -276,7 +276,7 @@ CS303 Operating Systems	19	27	70.4%"
             id="sub-input-attended" 
             min="0" 
             required 
-            value="20" 
+            placeholder="0" 
             class="field-input w-full text-xs"
           />
         </div>
@@ -287,7 +287,7 @@ CS303 Operating Systems	19	27	70.4%"
             id="sub-input-total" 
             min="1" 
             required 
-            value="25" 
+            placeholder="0" 
             class="field-input w-full text-xs"
           />
         </div>
@@ -307,7 +307,7 @@ CS303 Operating Systems	19	27	70.4%"
           <input 
             type="text" 
             id="sub-input-faculty" 
-            placeholder="Dr. Sharma" 
+            placeholder="e.g. Dr. Sharma" 
             class="field-input w-full text-xs"
           />
         </div>
