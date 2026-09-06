@@ -48,8 +48,6 @@ export const DEFAULT_AC: ACConfig = {
 
 export const DEFAULT_ATTENDANCE: AttendanceSubject[] = [];
 
-export const DEFAULT_TODOS: TodoItem[] = [];
-
 // Official Poornima Hostel Mess Menu from https://poornima.edu.in/life-at-poornima/menu-facility
 export const DEFAULT_MESS_MENU: MessDayMenu[] = [
   { 
