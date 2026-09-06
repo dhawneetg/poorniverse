@@ -6,6 +6,8 @@ import type {
   TodoItem,
   SGPAItem,
   MessDayMenu,
+  TaskFolder,
+  FolderTaskItem,
 } from './types';
 
 // Clean initial state representing real Poornima student workspace (no fake records)
@@ -45,8 +47,6 @@ export const DEFAULT_AC: ACConfig = {
 };
 
 export const DEFAULT_ATTENDANCE: AttendanceSubject[] = [];
-
-export const DEFAULT_TODOS: TodoItem[] = [];
 
 // Official Poornima Hostel Mess Menu from https://poornima.edu.in/life-at-poornima/menu-facility
 export const DEFAULT_MESS_MENU: MessDayMenu[] = [
@@ -108,6 +108,23 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
   },
 ];
 
+// Initial default folders for student projects (e.g. Game Dev, Side Projects)
+export const DEFAULT_FOLDERS: TaskFolder[] = [
+  { id: 'f-gamedev', name: 'Game Development', icon: '🎮', color: '#8b5cf6', createdAt: new Date().toISOString() },
+  { id: 'f-projects', name: 'Web / App Projects', icon: '💻', color: '#0066ff', createdAt: new Date().toISOString() },
+];
+
+export const DEFAULT_FOLDER_TASKS: FolderTaskItem[] = [
+  { id: 'ft-1', folderId: 'f-gamedev', title: 'Design character sprite & movement mechanics', completed: false, priority: 'high', createdAt: new Date().toISOString() },
+  { id: 'ft-2', folderId: 'f-gamedev', title: 'Implement collision detection and physics loop', completed: false, priority: 'medium', createdAt: new Date().toISOString() },
+  { id: 'ft-3', folderId: 'f-projects', title: 'Setup Supabase database schema and RLS policies', completed: true, priority: 'high', createdAt: new Date().toISOString() },
+];
+
+export const DEFAULT_TODOS: TodoItem[] = [
+  { id: 't-daily-1', title: 'Check daily TCS iON attendance percentage', category: 'Personal', priority: 'high', dueDate: new Date().toISOString().split('T')[0], completed: false, isDaily: true, isImportant: true, createdAt: new Date().toISOString() },
+  { id: 't-daily-2', title: 'Complete 1 daily DSA / coding problem', category: 'Personal', priority: 'medium', dueDate: new Date().toISOString().split('T')[0], completed: false, isDaily: true, isImportant: false, createdAt: new Date().toISOString() },
+];
+
 // Helper to load and save with LocalStorage
 const KEYS = {
   LAUNDRY: 'poornima_laundry_config',
@@ -117,6 +134,8 @@ const KEYS = {
   TODOS: 'poornima_todos',
   MESS: 'poornima_mess_menu',
   SETTINGS: 'poornima_app_settings',
+  TASK_FOLDERS: 'poornima_task_folders',
+  FOLDER_TASKS: 'poornima_folder_tasks',
 };
 
 export function getStoredData<T>(key: string, defaultValue: T): T {

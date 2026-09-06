@@ -6,6 +6,8 @@ import {
   DEFAULT_ATTENDANCE,
   DEFAULT_TODOS,
   DEFAULT_MESS_MENU,
+  DEFAULT_FOLDERS,
+  DEFAULT_FOLDER_TASKS,
   KEYS,
   getStoredData,
   setStoredData,
@@ -17,6 +19,8 @@ import type {
   AttendanceSubject,
   TodoItem,
   MessDayMenu,
+  TaskFolder,
+  FolderTaskItem,
 } from '../lib/types';
 import { calculateBunkStats, parseTcsIonText, generateTcsBookmarkletCode } from '../lib/tcs-parser';
 import { getSupabase, getSupabaseConfig, resetSupabaseClient } from '../lib/supabase';
@@ -27,7 +31,10 @@ import {
   pushWardrobeToSupabase,
   pushACLogToSupabase,
   pushTodosToSupabase,
+  pushTaskFoldersToSupabase,
+  pushFolderTasksToSupabase,
 } from '../lib/supabase-sync';
+import { autoSyncMessMenu } from '../lib/mess-sync';
 
 // State references
 let currentUserId: string | null = null;
@@ -37,10 +44,32 @@ let clothesState: ClothCategory[] = getStoredData(KEYS.CLOTHES, DEFAULT_CLOTHES)
 let acState: ACConfig = getStoredData(KEYS.AC, DEFAULT_AC);
 let attendanceState: AttendanceSubject[] = getStoredData(KEYS.ATTENDANCE, DEFAULT_ATTENDANCE);
 let todosState: TodoItem[] = getStoredData(KEYS.TODOS, DEFAULT_TODOS);
+let taskFoldersState: TaskFolder[] = getStoredData(KEYS.TASK_FOLDERS, DEFAULT_FOLDERS);
+let folderTasksState: FolderTaskItem[] = getStoredData(KEYS.FOLDER_TASKS, DEFAULT_FOLDER_TASKS);
+let activeFolderId: string = taskFoldersState.length > 0 ? taskFoldersState[0].id : '';
 let messState: MessDayMenu[] = getStoredData(KEYS.MESS, DEFAULT_MESS_MENU);
 
-let currentTodoFilter = 'all';
+let currentTodoMode: 'academic' | 'folders' = 'academic';
+let currentTodoScope: 'today' | 'tasks' | 'important' = 'today';
+let currentTodoCategory: string = 'all';
 let currentWearType: 'uniform' | 'lab' | 'casual' = 'uniform';
+
+function checkDailyAutoReset() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  let changed = false;
+  todosState = todosState.map(todo => {
+    if (todo.isDaily && todo.lastCompletedDate && todo.lastCompletedDate !== todayStr && todo.completed) {
+      changed = true;
+      return { ...todo, completed: false };
+    }
+    return todo;
+  });
+  if (changed) {
+    setStoredData(KEYS.TODOS, todosState);
+    if (currentUserId) pushTodosToSupabase(currentUserId, todosState).catch(() => {});
+  }
+}
+
 
 function purgeOldSampleData() {
   // Automatically purge legacy fake courses if detected
@@ -337,6 +366,18 @@ async function loadUserDataFromSupabase(userId: string) {
     setStoredData(KEYS.TODOS, todosState);
     renderTodos();
   }
+  if (synced.taskFolders && synced.taskFolders.length > 0) {
+    taskFoldersState = synced.taskFolders;
+    setStoredData(KEYS.TASK_FOLDERS, taskFoldersState);
+    if (!taskFoldersState.some(f => f.id === activeFolderId)) {
+      activeFolderId = taskFoldersState[0].id;
+    }
+  }
+  if (synced.folderTasks && synced.folderTasks.length > 0) {
+    folderTasksState = synced.folderTasks;
+    setStoredData(KEYS.FOLDER_TASKS, folderTasksState);
+  }
+  renderTaskFolders();
   updateHeaderTicker();
 }
 
@@ -1215,63 +1256,268 @@ function renderAC() {
 }
 
 // -------------------------------------------------------------
-// 6. TO-DO MODULE
+// 6. TO-DO & PROJECT FOLDER MODULE
 // -------------------------------------------------------------
 function setupTodoModule() {
   renderTodos();
+  renderTaskFolders();
 
-  const filterButtons = document.querySelectorAll('.todo-filter-btn');
-  filterButtons.forEach(btn => {
+  // Master Mode Switch: Academic/Daily vs Project Folders
+  const btnModeAcademic = document.getElementById('btn-mode-academic');
+  const btnModeFolders = document.getElementById('btn-mode-folders');
+  const viewAcademic = document.getElementById('view-academic-tasks');
+  const viewFolders = document.getElementById('view-folder-tasks');
+  const heading = document.getElementById('todo-main-heading');
+  const subtext = document.getElementById('todo-main-subtext');
+
+  btnModeAcademic?.addEventListener('click', () => {
+    currentTodoMode = 'academic';
+    btnModeAcademic.className = 'task-master-tab active px-4 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all flex items-center gap-1.5';
+    btnModeFolders?.setAttribute('class', 'task-master-tab px-4 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium text-xs transition-all flex items-center gap-1.5');
+    viewAcademic?.classList.remove('hidden');
+    viewFolders?.classList.add('hidden');
+    if (heading) heading.textContent = 'Academic Tasks & Deadlines';
+    if (subtext) subtext.textContent = "Manage today's routines, upcoming exam & assignment deadlines, and custom project folders";
+    renderTodos();
+  });
+
+  btnModeFolders?.addEventListener('click', () => {
+    currentTodoMode = 'folders';
+    btnModeFolders.className = 'task-master-tab active px-4 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all flex items-center gap-1.5';
+    btnModeAcademic?.setAttribute('class', 'task-master-tab px-4 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium text-xs transition-all flex items-center gap-1.5');
+    viewFolders?.classList.remove('hidden');
+    viewAcademic?.classList.add('hidden');
+    if (heading) heading.textContent = 'Project Folders';
+    if (subtext) subtext.textContent = 'Dedicated task spaces for your games, apps, research, and club projects';
+    renderTaskFolders();
+  });
+
+  // Scope Tabs: Today vs Just Tasks vs Important
+  const scopeButtons = document.querySelectorAll('.todo-scope-btn');
+  const catFilterContainer = document.getElementById('todo-category-filters');
+  const todayBanner = document.getElementById('today-progress-banner');
+
+  scopeButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      filterButtons.forEach(b => {
-        b.className = 'todo-filter-btn px-3.5 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium text-xs transition-all';
+      scopeButtons.forEach(b => {
+        b.className = 'todo-scope-btn px-3.5 py-1.5 rounded-full text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium transition-all';
       });
-      btn.className = 'todo-filter-btn active px-4 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all';
-      currentTodoFilter = btn.getAttribute('data-filter') || 'all';
+      btn.className = 'todo-scope-btn active px-3.5 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold transition-all';
+      currentTodoScope = (btn.getAttribute('data-scope') || 'today') as any;
+
+      if (currentTodoScope === 'today') {
+        todayBanner?.classList.remove('hidden');
+        catFilterContainer?.classList.add('hidden');
+      } else if (currentTodoScope === 'tasks') {
+        todayBanner?.classList.add('hidden');
+        catFilterContainer?.classList.remove('hidden');
+      } else {
+        todayBanner?.classList.add('hidden');
+        catFilterContainer?.classList.add('hidden');
+      }
+
       renderTodos();
     });
   });
 
+  // Category Filter Pills (in Just Tasks scope)
+  const catButtons = document.querySelectorAll('.todo-cat-btn');
+  catButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catButtons.forEach(b => {
+        b.className = 'todo-cat-btn px-2.5 py-1 rounded-lg text-[#707070] dark:text-[#a1a1aa] hover:bg-[#f3f3f3] dark:hover:bg-[#27272a] font-medium';
+      });
+      btn.className = 'todo-cat-btn active px-2.5 py-1 rounded-lg bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-medium';
+      currentTodoCategory = btn.getAttribute('data-cat') || 'all';
+      renderTodos();
+    });
+  });
+
+  // Quick Due Date Chips (Today, Tomorrow, Next Week)
+  const dueInput = document.getElementById('todo-input-due') as HTMLInputElement;
+  document.querySelectorAll('.btn-quick-due').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const days = parseInt(chip.getAttribute('data-days') || '0', 10);
+      const targetDate = new Date(Date.now() + days * 86400000);
+      if (dueInput) {
+        dueInput.value = targetDate.toISOString().split('T')[0];
+      }
+    });
+  });
+
+  // Quick Add Academic / Daily Todo Form
   document.getElementById('form-add-todo')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const titleInput = document.getElementById('todo-input-title') as HTMLInputElement;
     const catInput = document.getElementById('todo-input-category') as HTMLSelectElement;
     const prioInput = document.getElementById('todo-input-priority') as HTMLSelectElement;
-    const dueInput = document.getElementById('todo-input-due') as HTMLInputElement;
+    const toggleDaily = document.getElementById('todo-toggle-daily') as HTMLInputElement;
+    const toggleImportant = document.getElementById('todo-toggle-important') as HTMLInputElement;
 
     if (!titleInput?.value.trim()) return;
+
+    const isDaily = Boolean(toggleDaily?.checked);
+    const isImportant = Boolean(toggleImportant?.checked);
+    const dueDate = dueInput?.value || new Date().toISOString().split('T')[0];
 
     todosState.unshift({
       id: 't-' + Date.now(),
       title: titleInput.value.trim(),
       category: catInput.value as any,
-      priority: prioInput.value as any,
-      dueDate: dueInput.value || new Date().toISOString().split('T')[0],
+      priority: isImportant ? 'high' : (prioInput.value as any),
+      dueDate: dueDate,
       completed: false,
+      isDaily: isDaily,
+      isImportant: isImportant,
+      createdAt: new Date().toISOString(),
     });
 
     setStoredData(KEYS.TODOS, todosState);
     if (currentUserId) await pushTodosToSupabase(currentUserId, todosState);
 
     titleInput.value = '';
+    if (toggleDaily) toggleDaily.checked = false;
+    if (toggleImportant) toggleImportant.checked = false;
     renderTodos();
+  });
+
+  // Folder Actions: Create New Folder
+  document.getElementById('btn-create-folder')?.addEventListener('click', async () => {
+    const name = prompt('Enter project folder name (e.g. Unity Game, Web App, Research):');
+    if (!name?.trim()) return;
+
+    const icon = prompt('Enter an emoji icon for this folder:', '🎮') || '📁';
+    const newFolder: TaskFolder = {
+      id: 'f-' + Date.now(),
+      name: name.trim(),
+      icon: icon.trim(),
+      color: '#8b5cf6',
+      createdAt: new Date().toISOString(),
+    };
+
+    taskFoldersState.push(newFolder);
+    activeFolderId = newFolder.id;
+    setStoredData(KEYS.TASK_FOLDERS, taskFoldersState);
+    if (currentUserId) await pushTaskFoldersToSupabase(currentUserId, taskFoldersState);
+
+    renderTaskFolders();
+    confetti({ particleCount: 20, spread: 35 });
+  });
+
+  // Folder Actions: Delete Active Folder
+  document.getElementById('btn-delete-active-folder')?.addEventListener('click', async () => {
+    const folder = taskFoldersState.find(f => f.id === activeFolderId);
+    if (!folder) return;
+
+    if (confirm(`Delete folder "${folder.name}" and all its tasks?`)) {
+      taskFoldersState = taskFoldersState.filter(f => f.id !== activeFolderId);
+      folderTasksState = folderTasksState.filter(t => t.folderId !== activeFolderId);
+
+      activeFolderId = taskFoldersState.length > 0 ? taskFoldersState[0].id : '';
+
+      setStoredData(KEYS.TASK_FOLDERS, taskFoldersState);
+      setStoredData(KEYS.FOLDER_TASKS, folderTasksState);
+
+      if (currentUserId) {
+        await pushTaskFoldersToSupabase(currentUserId, taskFoldersState);
+        await pushFolderTasksToSupabase(currentUserId, folderTasksState);
+      }
+
+      renderTaskFolders();
+    }
+  });
+
+  // Folder Actions: Add Task to Active Folder Form
+  document.getElementById('form-add-folder-task')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!activeFolderId) {
+      alert('Please create or select a folder first!');
+      return;
+    }
+
+    const titleInput = document.getElementById('folder-task-input-title') as HTMLInputElement;
+    const prioInput = document.getElementById('folder-task-input-priority') as HTMLSelectElement;
+
+    if (!titleInput?.value.trim()) return;
+
+    folderTasksState.unshift({
+      id: 'ft-' + Date.now(),
+      folderId: activeFolderId,
+      title: titleInput.value.trim(),
+      completed: false,
+      priority: prioInput.value as any,
+      createdAt: new Date().toISOString(),
+    });
+
+    setStoredData(KEYS.FOLDER_TASKS, folderTasksState);
+    if (currentUserId) await pushFolderTasksToSupabase(currentUserId, folderTasksState);
+
+    titleInput.value = '';
+    renderTaskFolders();
   });
 }
 
 function renderTodos() {
+  checkDailyAutoReset();
   const container = document.getElementById('todos-container');
   if (!container) return;
 
-  const filtered = todosState.filter(t => currentTodoFilter === 'all' || t.category === currentTodoFilter);
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  // Update scope badge counts
+  const todayTasksAll = todosState.filter(t => t.isDaily || t.dueDate === todayStr || (!t.completed && t.dueDate && t.dueDate < todayStr));
+  const justTasksAll = todosState.filter(t => !t.isDaily);
+  const importantTasksAll = todosState.filter(t => t.isImportant || t.priority === 'high');
+
+  const countTodayEl = document.getElementById('todo-count-today');
+  const countJustTasksEl = document.getElementById('todo-count-just-tasks');
+  const countImportantEl = document.getElementById('todo-count-important');
+
+  if (countTodayEl) countTodayEl.textContent = todayTasksAll.length.toString();
+  if (countJustTasksEl) countJustTasksEl.textContent = justTasksAll.length.toString();
+  if (countImportantEl) countImportantEl.textContent = importantTasksAll.length.toString();
+
+  // Filter tasks based on current scope & category
+  let filtered: TodoItem[] = [];
+
+  if (currentTodoScope === 'today') {
+    filtered = todayTasksAll;
+    // Today progress calculation
+    const doneCount = filtered.filter(t => t.completed).length;
+    const totalCount = filtered.length;
+    const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+    const barEl = document.getElementById('today-progress-bar');
+    const badgeEl = document.getElementById('today-progress-badge');
+
+    if (barEl) barEl.style.width = `${pct}%`;
+    if (badgeEl) badgeEl.textContent = `${doneCount}/${totalCount} Done (${pct}%)`;
+  } else if (currentTodoScope === 'tasks') {
+    filtered = justTasksAll.filter(t => {
+      if (currentTodoCategory === 'all') return true;
+      const cat = (t.category || '').toLowerCase();
+      if (currentTodoCategory === 'assignment') return cat.includes('assign');
+      if (currentTodoCategory === 'exam') return cat.includes('exam') || cat.includes('mid');
+      if (currentTodoCategory === 'lab') return cat.includes('lab');
+      if (currentTodoCategory === 'general') return cat.includes('person') || cat.includes('general');
+      return true;
+    });
+  } else if (currentTodoScope === 'important') {
+    filtered = importantTasksAll;
+  }
+
   container.innerHTML = '';
 
-  const allCount = document.getElementById('todo-count-all');
-  if (allCount) allCount.textContent = todosState.length.toString();
-
   if (filtered.length === 0) {
+    const emptyMsg = currentTodoScope === 'today'
+      ? 'No routines or deadlines scheduled for today! Enjoy your free time or add a daily habit.'
+      : (currentTodoScope === 'important'
+        ? 'No important / starred tasks right now. Use the star icon on any task to flag it as important.'
+        : 'No pending tasks in this category.');
+
     container.innerHTML = `
       <div class="card-inner-well p-10 text-center text-[#707070] dark:text-[#a1a1aa] text-xs">
-        No pending tasks in this category.
+        ${emptyMsg}
       </div>
     `;
     return;
@@ -1280,45 +1526,81 @@ function renderTodos() {
   filtered.forEach(todo => {
     const card = document.createElement('div');
     card.className = `p-4 rounded-2xl card-inner-well flex items-center justify-between gap-4 transition-all ${todo.completed ? 'opacity-50' : ''}`;
-    
+
+    const isOverdue = todo.dueDate && todo.dueDate < todayStr && !todo.completed;
+    const isDueToday = todo.dueDate === todayStr;
+
+    let dueBadgeHtml = '';
+    if (todo.isDaily) {
+      dueBadgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#e0f2fe] dark:bg-[#082f49] text-[#0369a1] dark:text-[#38bdf8]">🔁 Daily Routine</span>';
+    } else if (isOverdue) {
+      dueBadgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fef2f2] dark:bg-[#450a0a] text-[#b91c1c] dark:text-[#f87171]">⚠️ Overdue (${todo.dueDate})</span>`;
+    } else if (isDueToday) {
+      dueBadgeHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fefce8] dark:bg-[#422006] text-[#a16207] dark:text-[#facc15]">⏰ Due Today</span>';
+    } else if (todo.dueDate) {
+      dueBadgeHtml = `<span class="text-[11px] text-[#707070] dark:text-[#a1a1aa]">Due: ${todo.dueDate}</span>`;
+    }
+
     const prioBadge = todo.priority === 'high'
-      ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#fef2f2] dark:bg-[#450a0a] text-[#b91c1c] dark:text-[#f87171] border border-[#fecaca] dark:border-[#7f1d1d]">High Priority</span>'
-      : (todo.priority === 'medium' ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#fefce8] dark:bg-[#422006] text-[#a16207] dark:text-[#facc15] border border-[#fef08a] dark:border-[#713f12]">Medium</span>' : '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#f0f0f0] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">Low</span>');
+      ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fef2f2] dark:bg-[#450a0a] text-[#b91c1c] dark:text-[#f87171] border border-[#fecaca] dark:border-[#7f1d1d]">High Priority</span>'
+      : (todo.priority === 'medium'
+        ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fefce8] dark:bg-[#422006] text-[#a16207] dark:text-[#facc15] border border-[#fef08a] dark:border-[#713f12]">Medium</span>'
+        : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f0f0f0] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">Low</span>');
+
+    const starIcon = todo.isImportant
+      ? '<button class="btn-toggle-star text-[#d97706] dark:text-[#facc15] text-sm hover:scale-110 transition-transform" title="Important (Click to unstar)">★</button>'
+      : '<button class="btn-toggle-star text-[#adadad] dark:text-[#71717a] hover:text-[#d97706] text-sm hover:scale-110 transition-transform" title="Mark Important">☆</button>';
 
     card.innerHTML = `
-      <div class="flex items-center gap-3.5 flex-1">
+      <div class="flex items-center gap-3 flex-1">
         <input 
           type="checkbox" 
           class="todo-chk w-4 h-4 rounded-md border-[#e0e0e0] dark:border-[#3f3f46] text-[#141414] dark:text-white cursor-pointer accent-[#141414] dark:accent-white" 
           ${todo.completed ? 'checked' : ''} 
           data-id="${todo.id}"
         />
-        <div>
-          <div class="flex items-center gap-2">
+        ${starIcon}
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2">
             <span class="font-heading text-sm text-[#141414] dark:text-white ${todo.completed ? 'line-through text-[#adadad] dark:text-[#71717a]' : ''}">${todo.title}</span>
             ${prioBadge}
             <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#f0f0f0] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">${todo.category}</span>
           </div>
-          ${todo.dueDate ? `<div class="font-caption text-[11px] mt-0.5 text-[#707070] dark:text-[#a1a1aa]">Due: ${todo.dueDate}</div>` : ''}
+          <div class="font-caption text-[11px] mt-1 flex items-center gap-2">
+            ${dueBadgeHtml}
+          </div>
         </div>
       </div>
 
-      <button class="btn-del-todo text-[#adadad] dark:text-[#71717a] hover:text-[#b91c1c] text-xs p-1" data-id="${todo.id}">
+      <button class="btn-del-todo text-[#adadad] dark:text-[#71717a] hover:text-[#b91c1c] text-xs p-1 transition-colors" data-id="${todo.id}">
         Remove
       </button>
     `;
 
+    // Checkbox toggle handler
     card.querySelector('.todo-chk')?.addEventListener('change', async (e) => {
       const isChecked = (e.target as HTMLInputElement).checked;
       todo.completed = isChecked;
+      if (todo.isDaily) {
+        todo.lastCompletedDate = isChecked ? todayStr : '';
+      }
       setStoredData(KEYS.TODOS, todosState);
       if (currentUserId) await pushTodosToSupabase(currentUserId, todosState);
       renderTodos();
       if (isChecked) {
-        confetti({ particleCount: 20, spread: 40, origin: { y: 0.7 } });
+        confetti({ particleCount: 25, spread: 45, origin: { y: 0.7 } });
       }
     });
 
+    // Star toggle handler
+    card.querySelector('.btn-toggle-star')?.addEventListener('click', async () => {
+      todo.isImportant = !todo.isImportant;
+      setStoredData(KEYS.TODOS, todosState);
+      if (currentUserId) await pushTodosToSupabase(currentUserId, todosState);
+      renderTodos();
+    });
+
+    // Delete handler
     card.querySelector('.btn-del-todo')?.addEventListener('click', async () => {
       todosState = todosState.filter(t => t.id !== todo.id);
       setStoredData(KEYS.TODOS, todosState);
@@ -1329,6 +1611,141 @@ function renderTodos() {
     container.appendChild(card);
   });
 }
+
+function renderTaskFolders() {
+  const pillsContainer = document.getElementById('task-folder-pills');
+  const tasksContainer = document.getElementById('folder-tasks-container');
+  const activeIconEl = document.getElementById('active-folder-icon');
+  const activeNameEl = document.getElementById('active-folder-name');
+  const activeStatsEl = document.getElementById('active-folder-stats');
+  const activeProgressEl = document.getElementById('active-folder-progress');
+
+  if (!pillsContainer || !tasksContainer) return;
+
+  // Make sure an active folder is selected
+  if (!activeFolderId && taskFoldersState.length > 0) {
+    activeFolderId = taskFoldersState[0].id;
+  }
+
+  // Render Folder Selector Pills
+  pillsContainer.innerHTML = '';
+  if (taskFoldersState.length === 0) {
+    pillsContainer.innerHTML = `<span class="text-xs text-[#707070] dark:text-[#a1a1aa]">No project folders yet. Click + New Folder!</span>`;
+  } else {
+    taskFoldersState.forEach(folder => {
+      const fTasks = folderTasksState.filter(t => t.folderId === folder.id);
+      const doneCount = fTasks.filter(t => t.completed).length;
+      const isActive = folder.id === activeFolderId;
+
+      const btn = document.createElement('button');
+      btn.className = isActive
+        ? 'px-3.5 py-1.5 rounded-full bg-[#141414] dark:bg-white text-white dark:text-[#141414] font-semibold text-xs transition-all flex items-center gap-1.5 whitespace-nowrap'
+        : 'px-3.5 py-1.5 rounded-full bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white font-medium text-xs transition-all flex items-center gap-1.5 whitespace-nowrap';
+
+      btn.innerHTML = `
+        <span>${folder.icon || '📁'}</span>
+        <span>${folder.name}</span>
+        <span class="text-[10px] opacity-75">(${doneCount}/${fTasks.length})</span>
+      `;
+
+      btn.addEventListener('click', () => {
+        activeFolderId = folder.id;
+        renderTaskFolders();
+      });
+
+      pillsContainer.appendChild(btn);
+    });
+  }
+
+  // Active Folder Header Details
+  const activeFolder = taskFoldersState.find(f => f.id === activeFolderId);
+  if (activeFolder) {
+    if (activeIconEl) activeIconEl.textContent = activeFolder.icon || '📁';
+    if (activeNameEl) activeNameEl.textContent = activeFolder.name;
+
+    const currentTasks = folderTasksState.filter(t => t.folderId === activeFolder.id);
+    const completedCount = currentTasks.filter(t => t.completed).length;
+    const totalCount = currentTasks.length;
+    const pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+    if (activeStatsEl) {
+      activeStatsEl.textContent = `${totalCount} tasks • ${completedCount} completed (${pct}%)`;
+    }
+    if (activeProgressEl) {
+      activeProgressEl.style.width = `${pct}%`;
+      activeProgressEl.style.backgroundColor = pct === 100 ? '#10b981' : (activeFolder.color || '#8b5cf6');
+    }
+
+    // Render Folder Tasks List
+    tasksContainer.innerHTML = '';
+    if (currentTasks.length === 0) {
+      tasksContainer.innerHTML = `
+        <div class="card-inner-well p-8 text-center text-[#707070] dark:text-[#a1a1aa] text-xs">
+          No tasks in this folder yet. Add your first milestone or task above!
+        </div>
+      `;
+      return;
+    }
+
+    currentTasks.forEach(task => {
+      const card = document.createElement('div');
+      card.className = `p-4 rounded-2xl card-inner-well flex items-center justify-between gap-4 transition-all ${task.completed ? 'opacity-50' : ''}`;
+
+      const prioBadge = task.priority === 'high'
+        ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fef2f2] dark:bg-[#450a0a] text-[#b91c1c] dark:text-[#f87171] border border-[#fecaca] dark:border-[#7f1d1d]">High</span>'
+        : (task.priority === 'medium'
+          ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fefce8] dark:bg-[#422006] text-[#a16207] dark:text-[#facc15] border border-[#fef08a] dark:border-[#713f12]">Medium</span>'
+          : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f0f0f0] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa]">Low</span>');
+
+      card.innerHTML = `
+        <div class="flex items-center gap-3.5 flex-1">
+          <input 
+            type="checkbox" 
+            class="folder-task-chk w-4 h-4 rounded-md border-[#e0e0e0] dark:border-[#3f3f46] text-[#141414] dark:text-white cursor-pointer accent-[#8b5cf6]" 
+            ${task.completed ? 'checked' : ''} 
+            data-id="${task.id}"
+          />
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-heading text-sm text-[#141414] dark:text-white ${task.completed ? 'line-through text-[#adadad] dark:text-[#71717a]' : ''}">${task.title}</span>
+              ${prioBadge}
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-del-folder-task text-[#adadad] dark:text-[#71717a] hover:text-[#b91c1c] text-xs p-1 transition-colors" data-id="${task.id}">
+          Remove
+        </button>
+      `;
+
+      card.querySelector('.folder-task-chk')?.addEventListener('change', async (e) => {
+        const isChecked = (e.target as HTMLInputElement).checked;
+        task.completed = isChecked;
+        setStoredData(KEYS.FOLDER_TASKS, folderTasksState);
+        if (currentUserId) await pushFolderTasksToSupabase(currentUserId, folderTasksState);
+        renderTaskFolders();
+        if (isChecked) {
+          confetti({ particleCount: 20, spread: 40, origin: { y: 0.7 } });
+        }
+      });
+
+      card.querySelector('.btn-del-folder-task')?.addEventListener('click', async () => {
+        folderTasksState = folderTasksState.filter(t => t.id !== task.id);
+        setStoredData(KEYS.FOLDER_TASKS, folderTasksState);
+        if (currentUserId) await pushFolderTasksToSupabase(currentUserId, folderTasksState);
+        renderTaskFolders();
+      });
+
+      tasksContainer.appendChild(card);
+    });
+  } else {
+    if (activeIconEl) activeIconEl.textContent = '📁';
+    if (activeNameEl) activeNameEl.textContent = 'No Folder Selected';
+    if (activeStatsEl) activeStatsEl.textContent = 'Create a folder to get started';
+    tasksContainer.innerHTML = '';
+  }
+}
+
 
 // -------------------------------------------------------------
 // 7. CAMPUS TOOLS MODULE
@@ -1426,36 +1843,24 @@ function setupCampusToolsModule() {
 
   renderMessForDay(todayName);
 
+  // Automated background mess sync with official Poornima live portal
+  autoSyncMessMenu().then(({ menu, status }) => {
+    messState = menu;
+    renderMessForDay(activeMessDay);
+    const statusBadge = document.getElementById('mess-status-badge');
+    if (statusBadge) statusBadge.textContent = status.message;
+  }).catch(() => {});
+
   // Live Sync button from official Poornima Firestore API
   document.getElementById('btn-fetch-live-menu')?.addEventListener('click', async () => {
     const statusBadge = document.getElementById('mess-status-badge');
-    if (statusBadge) statusBadge.textContent = 'Syncing...';
+    if (statusBadge) statusBadge.textContent = 'Syncing live...';
     try {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const res = await fetch(`https://firestore.googleapis.com/v1/projects/poornima-5c202/databases/(default)/documents/meals/${todayStr}?key=AIzaSyBrksZsdbuYx1ktbuUDqTtBkhoG7DAKOPU`);
-      if (res.ok) {
-        const doc = await res.json();
-        if (doc.fields) {
-          const liveBf = doc.fields.breakfast?.stringValue?.replace(/<[^>]*>/g, '') || '';
-          const liveLunch = doc.fields.lunch?.stringValue?.replace(/<[^>]*>/g, '') || '';
-          const liveSnacks = doc.fields.snacks?.stringValue?.replace(/<[^>]*>/g, '') || '';
-          const liveDinner = doc.fields.dinner?.stringValue?.replace(/<[^>]*>/g, '') || '';
-
-          messState = messState.map(m => m.day.toLowerCase() === todayName.toLowerCase() ? {
-            ...m,
-            breakfast: liveBf || m.breakfast,
-            lunch: liveLunch || m.lunch,
-            snacks: liveSnacks || m.snacks,
-            dinner: liveDinner || m.dinner,
-          } : m);
-          setStoredData(KEYS.MESS, messState);
-          renderMessForDay(todayName);
-          if (statusBadge) statusBadge.textContent = '✓ Live from college portal';
-          confetti({ particleCount: 20, spread: 35 });
-          return;
-        }
-      }
-      if (statusBadge) statusBadge.textContent = '✓ Official weekly schedule verified';
+      const { menu, status } = await autoSyncMessMenu();
+      messState = menu;
+      renderMessForDay(activeMessDay);
+      if (statusBadge) statusBadge.textContent = status.message;
+      confetti({ particleCount: 20, spread: 35 });
     } catch (e) {
       if (statusBadge) statusBadge.textContent = '✓ Using verified college menu';
     }
@@ -1490,6 +1895,8 @@ function setupSettingsModule() {
       ac: acState,
       attendance: attendanceState,
       todos: todosState,
+      taskFolders: taskFoldersState,
+      folderTasks: folderTasksState,
       exportedAt: new Date().toISOString(),
     };
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backup, null, 2));
@@ -1506,9 +1913,14 @@ function setupSettingsModule() {
       localStorage.removeItem(KEYS.LAUNDRY);
       localStorage.removeItem(KEYS.AC);
       localStorage.removeItem(KEYS.CLOTHES);
+      localStorage.removeItem(KEYS.TASK_FOLDERS);
+      localStorage.removeItem(KEYS.FOLDER_TASKS);
       
       attendanceState = [];
       todosState = [];
+      taskFoldersState = DEFAULT_FOLDERS;
+      folderTasksState = DEFAULT_FOLDER_TASKS;
+      activeFolderId = taskFoldersState[0]?.id || '';
       laundryState = { ...DEFAULT_LAUNDRY, usedTokens: 0, history: [] };
       acState = { ...DEFAULT_AC, usedUnits: 0, readings: [] };
       clothesState = DEFAULT_CLOTHES;
@@ -1516,6 +1928,8 @@ function setupSettingsModule() {
 
       setStoredData(KEYS.ATTENDANCE, attendanceState);
       setStoredData(KEYS.TODOS, todosState);
+      setStoredData(KEYS.TASK_FOLDERS, taskFoldersState);
+      setStoredData(KEYS.FOLDER_TASKS, folderTasksState);
       setStoredData(KEYS.LAUNDRY, laundryState);
       setStoredData(KEYS.AC, acState);
       setStoredData(KEYS.CLOTHES, clothesState);
@@ -1526,6 +1940,7 @@ function setupSettingsModule() {
       renderWardrobe();
       renderAC();
       renderTodos();
+      renderTaskFolders();
       updateHeaderTicker();
       modal?.classList.add('hidden');
       alert('Workspace cleared. You are now on a clean slate.');
