@@ -1,5 +1,5 @@
 import { getSupabase } from './supabase';
-import type { AttendanceSubject, LaundryConfig, ClothCategory, ACConfig, TodoItem } from './types';
+import type { AttendanceSubject, LaundryConfig, ClothCategory, ACConfig, TodoItem, TaskFolder, FolderTaskItem } from './types';
 
 // Sync service to fetch and push all data to Supabase
 export async function syncUserDataFromSupabase(userId: string) {
@@ -36,6 +36,19 @@ export async function syncUserDataFromSupabase(userId: string) {
     // 5. Fetch Todos
     const { data: todoData } = await supabase
       .from('academic_todos')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    // 6. Fetch Task Folders & Tasks
+    const { data: folderData } = await supabase
+      .from('task_folders')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true });
+
+    const { data: fTaskData } = await supabase
+      .from('folder_tasks')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -83,6 +96,25 @@ export async function syncUserDataFromSupabase(userId: string) {
         priority: t.priority,
         dueDate: t.due_date,
         completed: t.is_completed,
+        isDaily: Boolean(t.is_daily),
+        isImportant: Boolean(t.is_important),
+        lastCompletedDate: t.last_completed_date || undefined,
+      })) : null,
+      taskFolders: folderData && folderData.length > 0 ? folderData.map(f => ({
+        id: f.id,
+        name: f.name,
+        icon: f.icon || '📁',
+        color: f.color || '#0066ff',
+        createdAt: f.created_at,
+      })) : null,
+      folderTasks: fTaskData && fTaskData.length > 0 ? fTaskData.map(ft => ({
+        id: ft.id,
+        folderId: ft.folder_id,
+        title: ft.title,
+        completed: ft.is_completed,
+        priority: ft.priority || 'medium',
+        dueDate: ft.due_date || undefined,
+        createdAt: ft.created_at,
       })) : null,
     };
   } catch (err) {
@@ -188,9 +220,56 @@ export async function pushTodosToSupabase(userId: string, todos: TodoItem[]) {
       priority: t.priority,
       due_date: t.dueDate || null,
       is_completed: t.completed,
+      is_daily: Boolean(t.isDaily),
+      is_important: Boolean(t.isImportant),
+      last_completed_date: t.lastCompletedDate || null,
     }));
     await supabase.from('academic_todos').insert(rows);
   } catch (err) {
     console.error('Error saving todos to Supabase:', err);
   }
 }
+
+// Push Task Folders to Supabase
+export async function pushTaskFoldersToSupabase(userId: string, folders: TaskFolder[]) {
+  const supabase = getSupabase();
+  if (!supabase || !userId) return;
+
+  try {
+    await supabase.from('task_folders').delete().eq('user_id', userId);
+    const rows = folders.map(f => ({
+      id: f.id.startsWith('f-') ? undefined : f.id,
+      user_id: userId,
+      name: f.name,
+      icon: f.icon || '📁',
+      color: f.color || '#0066ff',
+      created_at: f.createdAt || new Date().toISOString(),
+    }));
+    await supabase.from('task_folders').insert(rows);
+  } catch (err) {
+    console.error('Error saving task folders to Supabase:', err);
+  }
+}
+
+// Push Folder Tasks to Supabase
+export async function pushFolderTasksToSupabase(userId: string, tasks: FolderTaskItem[]) {
+  const supabase = getSupabase();
+  if (!supabase || !userId) return;
+
+  try {
+    await supabase.from('folder_tasks').delete().eq('user_id', userId);
+    const rows = tasks.map(t => ({
+      user_id: userId,
+      folder_id: t.folderId,
+      title: t.title,
+      is_completed: t.completed,
+      priority: t.priority || 'medium',
+      due_date: t.dueDate || null,
+      created_at: t.createdAt || new Date().toISOString(),
+    }));
+    await supabase.from('folder_tasks').insert(rows);
+  } catch (err) {
+    console.error('Error saving folder tasks to Supabase:', err);
+  }
+}
+

@@ -56,7 +56,30 @@ export interface TodoItem {
   dueDate: string;
   completed: boolean;
   notes?: string;
+  isDaily?: boolean;          // Daily recurring routine
+  isImportant?: boolean;      // Starred / critical
+  lastCompletedDate?: string; // YYYY-MM-DD for midnight auto-reset
+  createdAt?: string;
 }
+
+export interface TaskFolder {
+  id: string;
+  name: string;
+  icon?: string;
+  color?: string;
+  createdAt: string;
+}
+
+export interface FolderTaskItem {
+  id: string;
+  folderId: string;
+  title: string;
+  completed: boolean;
+  priority?: 'high' | 'medium' | 'low';
+  dueDate?: string;
+  createdAt: string;
+}
+
 
 export interface SGPAItem {
   id: string;

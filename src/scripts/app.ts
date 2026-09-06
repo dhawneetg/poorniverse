@@ -6,6 +6,8 @@ import {
   DEFAULT_ATTENDANCE,
   DEFAULT_TODOS,
   DEFAULT_MESS_MENU,
+  DEFAULT_FOLDERS,
+  DEFAULT_FOLDER_TASKS,
   KEYS,
   getStoredData,
   setStoredData,
@@ -17,6 +19,8 @@ import type {
   AttendanceSubject,
   TodoItem,
   MessDayMenu,
+  TaskFolder,
+  FolderTaskItem,
 } from '../lib/types';
 import { calculateBunkStats, parseTcsIonText, generateTcsBookmarkletCode } from '../lib/tcs-parser';
 import { getSupabase, getSupabaseConfig, resetSupabaseClient } from '../lib/supabase';
@@ -27,7 +31,10 @@ import {
   pushWardrobeToSupabase,
   pushACLogToSupabase,
   pushTodosToSupabase,
+  pushTaskFoldersToSupabase,
+  pushFolderTasksToSupabase,
 } from '../lib/supabase-sync';
+import { autoSyncMessMenu } from '../lib/mess-sync';
 
 // State references
 let currentUserId: string | null = null;
@@ -37,10 +44,32 @@ let clothesState: ClothCategory[] = getStoredData(KEYS.CLOTHES, DEFAULT_CLOTHES)
 let acState: ACConfig = getStoredData(KEYS.AC, DEFAULT_AC);
 let attendanceState: AttendanceSubject[] = getStoredData(KEYS.ATTENDANCE, DEFAULT_ATTENDANCE);
 let todosState: TodoItem[] = getStoredData(KEYS.TODOS, DEFAULT_TODOS);
+let taskFoldersState: TaskFolder[] = getStoredData(KEYS.TASK_FOLDERS, DEFAULT_FOLDERS);
+let folderTasksState: FolderTaskItem[] = getStoredData(KEYS.FOLDER_TASKS, DEFAULT_FOLDER_TASKS);
+let activeFolderId: string = taskFoldersState.length > 0 ? taskFoldersState[0].id : '';
 let messState: MessDayMenu[] = getStoredData(KEYS.MESS, DEFAULT_MESS_MENU);
 
-let currentTodoFilter = 'all';
+let currentTodoMode: 'academic' | 'folders' = 'academic';
+let currentTodoScope: 'today' | 'tasks' | 'important' = 'today';
+let currentTodoCategory: string = 'all';
 let currentWearType: 'uniform' | 'lab' | 'casual' = 'uniform';
+
+function checkDailyAutoReset() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  let changed = false;
+  todosState = todosState.map(todo => {
+    if (todo.isDaily && todo.lastCompletedDate && todo.lastCompletedDate !== todayStr && todo.completed) {
+      changed = true;
+      return { ...todo, completed: false };
+    }
+    return todo;
+  });
+  if (changed) {
+    setStoredData(KEYS.TODOS, todosState);
+    if (currentUserId) pushTodosToSupabase(currentUserId, todosState).catch(() => {});
+  }
+}
+
 
 function purgeOldSampleData() {
   // Automatically purge legacy fake courses if detected
@@ -337,6 +366,18 @@ async function loadUserDataFromSupabase(userId: string) {
     setStoredData(KEYS.TODOS, todosState);
     renderTodos();
   }
+  if (synced.taskFolders && synced.taskFolders.length > 0) {
+    taskFoldersState = synced.taskFolders;
+    setStoredData(KEYS.TASK_FOLDERS, taskFoldersState);
+    if (!taskFoldersState.some(f => f.id === activeFolderId)) {
+      activeFolderId = taskFoldersState[0].id;
+    }
+  }
+  if (synced.folderTasks && synced.folderTasks.length > 0) {
+    folderTasksState = synced.folderTasks;
+    setStoredData(KEYS.FOLDER_TASKS, folderTasksState);
+  }
+  renderTaskFolders();
   updateHeaderTicker();
 }
 
