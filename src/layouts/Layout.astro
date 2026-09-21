@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   title?: string;
@@ -41,5 +42,6 @@ const {
   </head>
   <body class="min-h-screen bg-[#f8f9fa] dark:bg-[#09090b] text-[#09090b] dark:text-[#f4f4f5] antialiased selection:bg-blue-500/20 selection:text-blue-600 transition-colors duration-200">
     <slot />
+    <Analytics />
   </body>
 </html>

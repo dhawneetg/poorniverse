@@ -23,6 +23,31 @@ export interface MessSyncResult {
   syncedAt: string;
 }
 
+export type CollegeCode = 'ALL' | 'PU' | 'PCE' | 'PIET';
+
+/**
+ * Filter and format meal text (especially evening snacks) for a specific college campus.
+ * Example: "Dal Kachori, Tea (PIET) | Veg Sandwich, Tea (PCE) | Patties, Tea (PU)"
+ * When college is 'PCE', returns the PCE portion highlighted.
+ */
+export function formatMealForCollege(mealText: string, college: CollegeCode): { display: string; isSpecific: boolean } {
+  if (!mealText) return { display: '—', isSpecific: false };
+  if (college === 'ALL') return { display: mealText, isSpecific: false };
+
+  const parts = mealText.split('|').map(p => p.trim());
+  if (parts.length > 1) {
+    const matched = parts.find(p => {
+      const upper = p.toUpperCase();
+      return upper.includes(`(${college})`) || upper.includes(`(${college},`) || upper.includes(`, ${college})`);
+    });
+    if (matched) {
+      return { display: matched, isSpecific: true };
+    }
+  }
+
+  return { display: mealText, isSpecific: false };
+}
+
 /**
  * Automatically fetch the live weekly schedule from Poornima's official portal.
  * Saves to Supabase and LocalStorage without requiring human input.
@@ -56,6 +81,10 @@ export async function autoSyncMessMenu(): Promise<{ menu: MessDayMenu[]; status:
           const dateObj = new Date(dateStr + 'T00:00:00');
           if (isNaN(dateObj.getTime())) continue;
 
+          // Freshness validation: Ignore documents older than 45 days so stale data from 2025 doesn't corrupt active menu
+          const ageInDays = Math.abs((Date.now() - dateObj.getTime()) / (1000 * 60 * 60 * 24));
+          if (ageInDays > 45) continue;
+
           const dayName = DAY_NAMES[dateObj.getDay()];
           // Only pick the most recent menu for each day of the week
           if (!dayMap.has(dayName)) {
@@ -70,36 +99,38 @@ export async function autoSyncMessMenu(): Promise<{ menu: MessDayMenu[]; status:
           }
         }
 
-        // Merge with existing menu for all 7 days
-        const updatedMenu: MessDayMenu[] = currentMenu.map(existingDay => {
-          const live = dayMap.get(existingDay.day);
-          if (live) {
-            return {
-              ...existingDay,
-              breakfast: live.breakfast || existingDay.breakfast,
-              lunch: live.lunch || existingDay.lunch,
-              snacks: live.snacks || existingDay.snacks,
-              dinner: live.dinner || existingDay.dinner,
-            };
-          }
-          return existingDay;
-        });
+        if (dayMap.size > 0) {
+          // Merge with existing menu for all 7 days
+          const updatedMenu: MessDayMenu[] = currentMenu.map(existingDay => {
+            const live = dayMap.get(existingDay.day);
+            if (live) {
+              return {
+                ...existingDay,
+                breakfast: live.breakfast || existingDay.breakfast,
+                lunch: live.lunch || existingDay.lunch,
+                snacks: live.snacks || existingDay.snacks,
+                dinner: live.dinner || existingDay.dinner,
+              };
+            }
+            return existingDay;
+          });
 
-        currentMenu = updatedMenu;
-        setStoredData(KEYS.MESS, currentMenu);
+          currentMenu = updatedMenu;
+          setStoredData(KEYS.MESS, currentMenu);
 
-        // 2. Automatically sync to Supabase hostel_mess_menu
-        syncToSupabase(currentMenu).catch(() => {});
+          // 2. Automatically sync to Supabase hostel_mess_menu
+          syncToSupabase(currentMenu).catch(() => {});
 
-        return {
-          menu: currentMenu,
-          status: {
-            success: true,
-            source: 'official_portal',
-            message: '✓ Auto-synced live with official Poornima portal',
-            syncedAt: nowIso,
-          },
-        };
+          return {
+            menu: currentMenu,
+            status: {
+              success: true,
+              source: 'official_portal',
+              message: '✓ Auto-synced live with official Poornima portal',
+              syncedAt: nowIso,
+            },
+          };
+        }
       }
     }
   } catch (err) {

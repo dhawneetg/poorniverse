@@ -54,7 +54,7 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
     day: 'Monday', 
     breakfast: 'Sada Paratha + Mirch Achar, Bread Butter, Tea, Hot Milk', 
     lunch: 'Aloo Chhole, Dal, Kaddu, Plain Rice, Rayta, Chapati, Achar, Salad', 
-    snacks: 'Dal Kachori / Veg Sandwich, Tea', 
+    snacks: 'Dal Kachori, Tea (PIET) | Veg Sandwich, Tea (PCE) | Patties, Tea (PU)', 
     dinner: 'Aloo Tamatar / Aloo Mangodi, Dal, Karela, Plain Rice, Curd, Chapati, Achar, Salad', 
     rating: 4.2 
   },
@@ -62,7 +62,7 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
     day: 'Tuesday', 
     breakfast: 'Veg Upma / Poha + Sev Namkeen, Bread Butter, Tea, Hot Milk', 
     lunch: 'Rajma, Dal, Turai / Tinda, Rayta, Plain Rice, Chapati, Achar, Salad', 
-    snacks: 'Samosa / Aloo Patties, Tea', 
+    snacks: 'Samosa, Tea (PCE) | Aloo Patties, Tea (PU) | Bread Pakoda, Tea (PIET)', 
     dinner: 'Shahi Paneer, Dal, Loki / Phool Gobi, Plain Rice, Curd, Chapati, Achar, Salad', 
     rating: 4.5 
   },
@@ -70,7 +70,7 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
     day: 'Wednesday', 
     breakfast: 'Idli Sambhar + Coconut Chutney, Bread Butter, Tea, Hot Milk', 
     lunch: 'Dahi Aloo, Dal, Patta Gobi, Plain Rice, Rayta, Chapati, Achar, Salad', 
-    snacks: 'Bhelpuri + Chutney / Sandwich, Tea', 
+    snacks: 'Bhelpuri, Tea (PU) | Veg Sandwich, Tea (PCE) | Pasta, Tea (PIET)', 
     dinner: 'Kala Chana / Paneer, Dal, Gilodi, Plain Rice, Curd, Chapati, Achar, Salad', 
     rating: 4.3 
   },
@@ -78,7 +78,7 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
     day: 'Thursday', 
     breakfast: 'Mix Paratha, Bread Butter, Thandai, Tea', 
     lunch: 'Dal, Patta Gobi, Kala Chana, Rayta, Chapati, Salad, Achar', 
-    snacks: 'Bhelpuri, Tea', 
+    snacks: 'Bhelpuri, Tea (PCE) | Samosa, Tea (PIET) | Patties, Cold Drink/Tea (PU)', 
     dinner: 'Dal, Corn Palak, Razma, Plain Rice, Chapati, Dahi, Salad', 
     rating: 4.8 
   },
@@ -86,7 +86,7 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
     day: 'Friday', 
     breakfast: 'Pav Bhaji / Poha, Bread Butter, Tea, Hot Milk', 
     lunch: 'Besan Gatta Masala / Chana Dal, Bhindi, Plain Rice, Rayta, Chapati, Salad, Achar', 
-    snacks: 'Sabudana Khichdi / Veg Pasta, Tea', 
+    snacks: 'Sabudana Khichdi, Tea (PU) | Veg Pasta, Tea (PCE) | Bread Roll, Tea (PIET)', 
     dinner: 'Dal, Pyaz Matar, Soyabean, Plain Rice, Curd, Chapati, Dahi, Salad', 
     rating: 4.4 
   },
@@ -94,7 +94,7 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
     day: 'Saturday', 
     breakfast: 'Poori Aloo Bhaji, Bread Butter, Tea, Hot Milk', 
     lunch: 'Dal, Dahi Loki, Chhola, Rayta, Plain Rice, Chapati, Salad, Achar', 
-    snacks: 'Dal Pakodi / Sambar Vada, Tea', 
+    snacks: 'Dal Pakodi, Tea (PCE) | Sambar Vada, Tea (PIET) | Bread Butter, Tea (PU)', 
     dinner: 'Kadhi, Patta Gobi, Chivda, Pila Pulao, Chapati, Dahi, Salad', 
     rating: 4.6 
   },
@@ -102,7 +102,7 @@ export const DEFAULT_MESS_MENU: MessDayMenu[] = [
     day: 'Sunday', 
     breakfast: 'Mix Paratha / Aloo Paratha Masala, Bread Butter, Thandai, Tea', 
     lunch: 'Dal, Sukhe Aloo, Rayta, Matar Pulao, Chapati, Sevdi, Papad, Salad, Achar', 
-    snacks: 'Poha, Tea', 
+    snacks: 'Poha, Tea (PCE, PIET) | Veg Cutlet, Tea (PU)', 
     dinner: 'Malai Kofta / Paneer, Dal, Plain Rice, Chapati, Dahi, Salad, Kheer / Gulab Jamun', 
     rating: 5.0 
   },
@@ -133,6 +133,7 @@ const KEYS = {
   ATTENDANCE: 'poornima_attendance',
   TODOS: 'poornima_todos',
   MESS: 'poornima_mess_menu',
+  COLLEGE_FILTER: 'poornima_mess_college_filter',
   SETTINGS: 'poornima_app_settings',
   TASK_FOLDERS: 'poornima_task_folders',
   FOLDER_TASKS: 'poornima_folder_tasks',

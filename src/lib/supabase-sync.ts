@@ -67,12 +67,14 @@ export async function syncUserDataFromSupabase(userId: string) {
         totalTokens: laundryData.total_tokens || 60,
         usedTokens: laundryData.used_tokens || 0,
         targetMonths: laundryData.target_months || 5,
+        startDate: laundryData.start_date || new Date().toISOString().split('T')[0],
         washBatchSizeThreshold: laundryData.wash_batch_threshold || 10,
         history: [],
       } : null,
       wardrobe: wardrobeData && wardrobeData.length > 0 ? wardrobeData.map(w => ({
         id: w.id,
         name: w.name,
+        icon: w.icon || '👕',
         color: w.color,
         type: w.category_type,
         cleanCount: w.clean_count,
@@ -82,12 +84,15 @@ export async function syncUserDataFromSupabase(userId: string) {
       ac: acData && acData.length > 0 ? {
         totalUnits: 1000,
         usedUnits: Number(acData[0].consumed_units) || 0,
+        targetMonths: 6,
+        targetDailyLimit: 4.5,
         readings: acData.map(r => ({
           id: r.id,
           date: r.reading_date,
           meterReading: Number(r.meter_reading),
           consumedSinceLast: Number(r.consumed_units),
         })),
+        monthlyBudgets: {},
       } : null,
       todos: todoData && todoData.length > 0 ? todoData.map(t => ({
         id: t.id,

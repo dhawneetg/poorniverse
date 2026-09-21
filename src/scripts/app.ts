@@ -34,7 +34,7 @@ import {
   pushTaskFoldersToSupabase,
   pushFolderTasksToSupabase,
 } from '../lib/supabase-sync';
-import { autoSyncMessMenu } from '../lib/mess-sync';
+import { autoSyncMessMenu, formatMealForCollege, type CollegeCode } from '../lib/mess-sync';
 
 // State references
 let currentUserId: string | null = null;
@@ -48,6 +48,7 @@ let taskFoldersState: TaskFolder[] = getStoredData(KEYS.TASK_FOLDERS, DEFAULT_FO
 let folderTasksState: FolderTaskItem[] = getStoredData(KEYS.FOLDER_TASKS, DEFAULT_FOLDER_TASKS);
 let activeFolderId: string = taskFoldersState.length > 0 ? taskFoldersState[0].id : '';
 let messState: MessDayMenu[] = getStoredData(KEYS.MESS, DEFAULT_MESS_MENU);
+let activeMessCollege: CollegeCode = getStoredData<CollegeCode>(KEYS.COLLEGE_FILTER, 'ALL');
 
 let currentTodoMode: 'academic' | 'folders' = 'academic';
 let currentTodoScope: 'today' | 'tasks' | 'important' = 'today';
@@ -92,8 +93,8 @@ function purgeOldSampleData() {
     acState = { ...DEFAULT_AC, usedUnits: 0, readings: [] };
     setStoredData(KEYS.AC, acState);
   }
-  // Always update messState to official DEFAULT_MESS_MENU
-  if (!messState || messState.length === 0 || messState[0].breakfast.includes('Curd, Tea/Coffee')) {
+  // Always update messState to official DEFAULT_MESS_MENU if outdated or missing college tags
+  if (!messState || messState.length === 0 || !messState[0]?.snacks?.includes('(')) {
     messState = DEFAULT_MESS_MENU;
     setStoredData(KEYS.MESS, messState);
   }
@@ -1817,12 +1818,32 @@ function setupCampusToolsModule() {
     const bfEl = document.getElementById('mess-bf');
     const lunchEl = document.getElementById('mess-lunch');
     const snacksEl = document.getElementById('mess-snacks');
+    const snacksTag = document.getElementById('mess-snacks-tag');
     const dinnerEl = document.getElementById('mess-dinner');
+    const footerColleges = document.getElementById('mess-footer-colleges');
 
     if (bfEl) bfEl.innerHTML = menu.breakfast;
     if (lunchEl) lunchEl.innerHTML = menu.lunch;
-    if (snacksEl) snacksEl.innerHTML = menu.snacks;
     if (dinnerEl) dinnerEl.innerHTML = menu.dinner;
+
+    if (snacksEl) {
+      const formatted = formatMealForCollege(menu.snacks, activeMessCollege);
+      snacksEl.innerHTML = formatted.display;
+      if (snacksTag) {
+        if (formatted.isSpecific) {
+          snacksTag.textContent = `${activeMessCollege} Campus`;
+          snacksTag.classList.remove('hidden');
+        } else {
+          snacksTag.classList.add('hidden');
+        }
+      }
+    }
+
+    if (footerColleges) {
+      footerColleges.textContent = activeMessCollege === 'ALL'
+        ? 'Official Schedule • PU, PCE & PIET'
+        : `Official Schedule • Filtered for ${activeMessCollege}`;
+    }
 
     document.querySelectorAll('.mess-day-btn').forEach(btn => {
       const bDay = btn.getAttribute('data-day');
@@ -1832,12 +1853,30 @@ function setupCampusToolsModule() {
         btn.className = 'mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all';
       }
     });
+
+    document.querySelectorAll('.mess-college-btn').forEach(btn => {
+      const col = btn.getAttribute('data-college');
+      if (col === activeMessCollege) {
+        btn.className = 'mess-college-btn px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-[#141414] dark:bg-white text-white dark:text-[#141414] transition-all';
+      } else {
+        btn.className = 'mess-college-btn px-2.5 py-0.5 rounded-lg text-[11px] font-semibold text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white transition-all';
+      }
+    });
   }
 
   document.querySelectorAll('.mess-day-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const day = btn.getAttribute('data-day');
       if (day) renderMessForDay(day);
+    });
+  });
+
+  document.querySelectorAll('.mess-college-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const col = (btn.getAttribute('data-college') || 'ALL') as CollegeCode;
+      activeMessCollege = col;
+      setStoredData(KEYS.COLLEGE_FILTER, col);
+      renderMessForDay(activeMessDay);
     });
   });
 

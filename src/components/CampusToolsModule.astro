@@ -115,10 +115,21 @@
         </div>
 
         <h3 class="font-heading text-xl mt-3 text-[#141414] dark:text-white">Daily Meal Schedule</h3>
-        <p class="font-caption text-xs mt-1 text-[#707070] dark:text-[#a1a1aa]">Poornima University Hostel Dining Timings & Official Menu</p>
+        <p class="font-caption text-xs mt-1 text-[#707070] dark:text-[#a1a1aa]">Poornima Group Hostel Dining Timings & Official Rotation</p>
+
+        <!-- College Selector Filter -->
+        <div class="mt-3 flex items-center justify-between gap-2 p-1.5 rounded-xl bg-[#f3f3f3] dark:bg-[#1f1f23]">
+          <span class="text-[11px] font-semibold text-[#707070] dark:text-[#a1a1aa] pl-1">Hostel Campus:</span>
+          <div class="flex items-center gap-1" id="mess-college-selector">
+            <button class="mess-college-btn px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-[#141414] dark:bg-white text-white dark:text-[#141414] transition-all" data-college="ALL">All</button>
+            <button class="mess-college-btn px-2.5 py-0.5 rounded-lg text-[11px] font-semibold text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white transition-all" data-college="PU">PU</button>
+            <button class="mess-college-btn px-2.5 py-0.5 rounded-lg text-[11px] font-semibold text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white transition-all" data-college="PCE">PCE</button>
+            <button class="mess-college-btn px-2.5 py-0.5 rounded-lg text-[11px] font-semibold text-[#707070] dark:text-[#a1a1aa] hover:text-[#141414] dark:hover:text-white transition-all" data-college="PIET">PIET</button>
+          </div>
+        </div>
 
         <!-- Weekday Navigation Tabs -->
-        <div class="mt-4 flex items-center gap-1 overflow-x-auto pb-1" id="mess-day-tabs">
+        <div class="mt-3 flex items-center gap-1 overflow-x-auto pb-1" id="mess-day-tabs">
           <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#141414] dark:bg-white text-white dark:text-[#141414] transition-all" data-day="Monday">Mon</button>
           <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Tuesday">Tue</button>
           <button class="mess-day-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#f3f3f3] dark:bg-[#27272a] text-[#707070] dark:text-[#a1a1aa] transition-all" data-day="Wednesday">Wed</button>
@@ -147,8 +158,9 @@
 
           <!-- Evening Snacks -->
           <div class="p-3 rounded-2xl card-inner-well">
-            <div class="flex justify-between font-semibold text-[#141414] dark:text-white">
+            <div class="flex justify-between items-center font-semibold text-[#141414] dark:text-white">
               <span>Snacks (5:00 - 6:00 PM)</span>
+              <span id="mess-snacks-tag" class="text-[10px] font-normal px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 hidden">Campus Tag</span>
             </div>
             <p id="mess-snacks" class="text-[11px] text-[#707070] dark:text-[#a1a1aa] mt-1 leading-relaxed">Loading...</p>
           </div>
@@ -164,7 +176,7 @@
       </div>
 
       <div class="mt-5 pt-4 border-t border-[#e0e0e0] dark:border-[#27272a] flex items-center justify-between text-[11px] text-[#707070] dark:text-[#a1a1aa]">
-        <span>Official Menu • Verified for PCE & PU Hostels</span>
+        <span id="mess-footer-colleges">Official Schedule • PU, PCE & PIET</span>
         <span id="mess-status-badge" class="text-[#047857] dark:text-[#34d399] font-medium">✓ College portal synced</span>
       </div>
     </div>
