@@ -346,27 +346,41 @@ async function loadUserDataFromSupabase(userId: string) {
     attendanceState = synced.attendance;
     setStoredData(KEYS.ATTENDANCE, attendanceState);
     renderAttendance();
+  } else if (attendanceState && attendanceState.length > 0) {
+    await pushAttendanceToSupabase(userId, attendanceState);
   }
+
   if (synced.laundry) {
     laundryState = synced.laundry;
     setStoredData(KEYS.LAUNDRY, laundryState);
     renderLaundry();
+  } else if (laundryState) {
+    await pushLaundryToSupabase(userId, laundryState);
   }
+
   if (synced.wardrobe && synced.wardrobe.length > 0) {
     clothesState = synced.wardrobe;
     setStoredData(KEYS.CLOTHES, clothesState);
     renderWardrobe();
+  } else if (clothesState && clothesState.length > 0) {
+    await pushWardrobeToSupabase(userId, clothesState);
   }
+
   if (synced.ac) {
     acState = synced.ac;
     setStoredData(KEYS.AC, acState);
     renderAC();
   }
+
   if (synced.todos && synced.todos.length > 0) {
     todosState = synced.todos;
     setStoredData(KEYS.TODOS, todosState);
     renderTodos();
+  } else if (todosState && todosState.length > 0) {
+    // If Supabase has no todos yet, upload current local todos so mobile can see them
+    await pushTodosToSupabase(userId, todosState);
   }
+
   if (synced.taskFolders && synced.taskFolders.length > 0) {
     taskFoldersState = synced.taskFolders;
     setStoredData(KEYS.TASK_FOLDERS, taskFoldersState);
