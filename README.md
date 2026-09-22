@@ -98,44 +98,46 @@ Poornima College students face specific operational friction every semester:
 ## 📁 Repository Structure
 
 ```text
-├── public/
-│   ├── favicon.svg
-│   └── tcs-extension/             # 🧩 Unpacked Chrome Extension (Manifest V3)
-│       ├── manifest.json
-│       ├── popup.html
-│       ├── popup.js
-│       └── content.js
-├── src/
-│   ├── components/
-│   │   ├── AttendanceModule.astro    # TCS iON & Bunk calculator
-│   │   ├── HostelQuotasModule.astro  # Laundry, Wardrobe & AC Meter
-│   │   ├── TodoModule.astro          # Academic & Folder-wise tasks
-│   │   ├── CampusToolsModule.astro   # SGPA calculator & Mess menu
-│   │   ├── Header.astro              # Navigation, theme toggle & auth
-│   │   ├── AuthModal.astro           # Supabase sign-in / register modal
-│   │   ├── SettingsModal.astro       # API keys, backup, export/import
-│   │   └── ExtensionModal.astro      # Instructions for Chrome extension
-│   ├── layouts/
-│   │   └── Layout.astro              # Base HTML wrapper with theme script
-│   ├── lib/
-│   │   ├── gemini.ts                 # Google Gemini API connector
-│   │   ├── mess-sync.ts              # Live Poornima Firestore mess fetcher
-│   │   ├── storage.ts                # LocalStorage management & defaults
-│   │   ├── supabase.ts               # Supabase client initializer
-│   │   ├── supabase-sync.ts          # Two-way sync engine
-│   │   ├── tcs-parser.ts             # TCS iON raw HTML parser
-│   │   └── types.ts                  # TypeScript interfaces
-│   ├── pages/
-│   │   └── index.astro               # Single-page dynamic tab view
-│   ├── scripts/
-│   │   └── app.ts                    # Core client-side reactive state engine
-│   └── styles/
-│       └── global.css                # Tailwind v4 theme & Mobbin tokens
-├── supabase/
-│   └── schema.sql                    # PostgreSQL schema + RLS policies
-├── .env.example
-├── astro.config.mjs
-├── package.json
+├── cosmic-chasm/                      # Main application codebase (Astro project)
+│   ├── public/
+│   │   ├── favicon.svg
+│   │   └── tcs-extension/             # 🧩 Unpacked Chrome Extension (Manifest V3)
+│   │       ├── manifest.json
+│   │       ├── popup.html
+│   │       ├── popup.js
+│   │       └── content.js
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AttendanceModule.astro    # TCS iON & Bunk calculator
+│   │   │   ├── HostelQuotasModule.astro  # Laundry, Wardrobe & AC Meter
+│   │   │   ├── TodoModule.astro          # Academic & Folder-wise tasks
+│   │   │   ├── CampusToolsModule.astro   # SGPA calculator & Mess menu
+│   │   │   ├── Header.astro              # Navigation, theme toggle & auth
+│   │   │   ├── AuthModal.astro           # Supabase sign-in / register modal
+│   │   │   ├── SettingsModal.astro       # API keys, backup, export/import
+│   │   │   └── ExtensionModal.astro      # Instructions for Chrome extension
+│   │   ├── layouts/
+│   │   │   └── Layout.astro              # Base HTML wrapper with theme script
+│   │   ├── lib/
+│   │   │   ├── gemini.ts                 # Google Gemini API connector
+│   │   │   ├── mess-sync.ts              # Live Poornima Firestore mess fetcher
+│   │   │   ├── storage.ts                # LocalStorage management & defaults
+│   │   │   ├── supabase.ts               # Supabase client initializer
+│   │   │   ├── supabase-sync.ts          # Two-way sync engine
+│   │   │   ├── tcs-parser.ts             # TCS iON raw HTML parser
+│   │   │   └── types.ts                  # TypeScript interfaces
+│   │   ├── pages/
+│   │   │   └── index.astro               # Single-page dynamic tab view
+│   │   ├── scripts/
+│   │   │   └── app.ts                    # Core client-side reactive state engine
+│   │   └── styles/
+│   │       └── global.css                # Tailwind v4 theme & Mobbin tokens
+│   ├── supabase/
+│   │   └── schema.sql                    # PostgreSQL schema + RLS policies
+│   ├── .env.example
+│   ├── astro.config.mjs
+│   └── package.json
+├── package.json                          # Workspace root runner
 └── README.md
 ```
 
@@ -150,8 +152,8 @@ Poornima College students face specific operational friction every semester:
 ### 1. Clone & Install Dependencies
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/cosmic-chasm.git
-cd cosmic-chasm
+git clone https://github.com/your-username/college-related-tools.git
+cd college-related-tools/cosmic-chasm
 
 # Install packages
 npm install
@@ -178,7 +180,13 @@ PUBLIC_APP_URL=http://localhost:4321
 ```
 
 ### 3. Start the Development Server
+From either the workspace root or inside `cosmic-chasm/`:
 ```bash
+# From workspace root:
+npm run dev
+
+# Or directly in cosmic-chasm:
+cd cosmic-chasm
 npm run dev
 ```
 
@@ -188,14 +196,14 @@ Open your browser at **`http://localhost:4321`**.
 
 ## 🧩 TCS iON Chrome Extension
 
-The project includes an unpacked **Manifest V3 Chrome Extension** located in `public/tcs-extension`.
+The project includes an unpacked **Manifest V3 Chrome Extension** located in `cosmic-chasm/public/tcs-extension`.
 
 ### Installation Steps:
 1. Open Google Chrome (or any Chromium browser like Brave/Edge).
 2. Navigate to `chrome://extensions`.
 3. Enable **Developer mode** using the toggle switch in the top-right corner.
 4. Click **"Load unpacked"**.
-5. Select the `public/tcs-extension` folder inside this repository.
+5. Select the `cosmic-chasm/public/tcs-extension` folder.
 6. Log in to your Poornima TCS iON attendance portal.
 7. Open the extension popup and click **"Sync to Companion"** to import all subjects instantly.
 
@@ -207,7 +215,7 @@ To enable cloud synchronization across mobile and desktop devices:
 
 1. Create a free project at [supabase.com](https://supabase.com).
 2. Navigate to the **SQL Editor** in your Supabase Dashboard.
-3. Open [`supabase/schema.sql`](supabase/schema.sql) and paste its contents into the SQL Editor.
+3. Open [`cosmic-chasm/supabase/schema.sql`](cosmic-chasm/supabase/schema.sql) and paste its contents into the SQL Editor.
 4. Run the script to provision:
    - `profiles`
    - `attendance_courses`
