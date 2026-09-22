@@ -94,17 +94,34 @@ export async function syncUserDataFromSupabase(userId: string) {
         })),
         monthlyBudgets: {},
       } : null,
-      todos: todoData && todoData.length > 0 ? todoData.map(t => ({
-        id: t.id,
-        title: t.title,
-        category: t.category,
-        priority: t.priority,
-        dueDate: t.due_date,
-        completed: t.is_completed,
-        isDaily: Boolean(t.is_daily),
-        isImportant: Boolean(t.is_important),
-        lastCompletedDate: t.last_completed_date || undefined,
-      })) : null,
+      todos: todoData && todoData.length > 0 ? todoData.map(t => {
+        let isDaily = Boolean(t.is_daily);
+        let isImportant = Boolean(t.is_important);
+        let lastCompletedDate = t.last_completed_date || undefined;
+        let category = t.category || 'Personal';
+
+        if (category && category.startsWith('{') && category.endsWith('}')) {
+          try {
+            const parsed = JSON.parse(category);
+            category = parsed.cat || parsed.category || 'Personal';
+            if (parsed.isDaily !== undefined) isDaily = Boolean(parsed.isDaily);
+            if (parsed.isImportant !== undefined) isImportant = Boolean(parsed.isImportant);
+            if (parsed.lastCompletedDate) lastCompletedDate = parsed.lastCompletedDate;
+          } catch {}
+        }
+
+        return {
+          id: t.id,
+          title: t.title,
+          category,
+          priority: t.priority || 'medium',
+          dueDate: t.due_date || undefined,
+          completed: Boolean(t.is_completed),
+          isDaily,
+          isImportant,
+          lastCompletedDate,
+        };
+      }) : null,
       taskFolders: folderData && folderData.length > 0 ? folderData.map(f => ({
         id: f.id,
         name: f.name,
@@ -218,18 +235,44 @@ export async function pushTodosToSupabase(userId: string, todos: TodoItem[]) {
 
   try {
     await supabase.from('academic_todos').delete().eq('user_id', userId);
+
     const rows = todos.map(t => ({
       user_id: userId,
       title: t.title,
-      category: t.category,
-      priority: t.priority,
+      category: t.category || 'Personal',
+      priority: t.priority || 'medium',
       due_date: t.dueDate || null,
-      is_completed: t.completed,
+      is_completed: Boolean(t.completed),
       is_daily: Boolean(t.isDaily),
       is_important: Boolean(t.isImportant),
       last_completed_date: t.lastCompletedDate || null,
     }));
-    await supabase.from('academic_todos').insert(rows);
+
+    const { error } = await supabase.from('academic_todos').insert(rows);
+
+    // If Supabase table does not have is_daily/is_important columns yet (PGRST204), fallback to storing metadata in category
+    if (error && (error.code === 'PGRST204' || error.message?.includes('is_daily'))) {
+      const fallbackRows = todos.map(t => ({
+        user_id: userId,
+        title: t.title,
+        category: JSON.stringify({
+          cat: t.category || 'Personal',
+          isDaily: Boolean(t.isDaily),
+          isImportant: Boolean(t.isImportant),
+          lastCompletedDate: t.lastCompletedDate || null,
+        }),
+        priority: t.priority || 'medium',
+        due_date: t.dueDate || null,
+        is_completed: Boolean(t.completed),
+      }));
+
+      const { error: fallbackErr } = await supabase.from('academic_todos').insert(fallbackRows);
+      if (fallbackErr) {
+        console.error('Fallback todos insert error:', fallbackErr);
+      }
+    } else if (error) {
+      console.error('Error saving todos to Supabase:', error);
+    }
   } catch (err) {
     console.error('Error saving todos to Supabase:', err);
   }

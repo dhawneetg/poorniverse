@@ -421,6 +421,34 @@ function setupAuthModule() {
     alert('You have signed out successfully.');
   });
 
+  document.getElementById('btn-header-sync-now')?.addEventListener('click', async () => {
+    if (!currentUserId) {
+      alert('Please sign in to sync with cloud.');
+      return;
+    }
+    const btn = document.getElementById('btn-header-sync-now');
+    if (btn) btn.textContent = '⏳ Syncing...';
+    try {
+      if (todosState && todosState.length > 0) await pushTodosToSupabase(currentUserId, todosState);
+      if (attendanceState && attendanceState.length > 0) await pushAttendanceToSupabase(currentUserId, attendanceState);
+      if (laundryState) await pushLaundryToSupabase(currentUserId, laundryState);
+      if (clothesState && clothesState.length > 0) await pushWardrobeToSupabase(currentUserId, clothesState);
+      if (taskFoldersState && taskFoldersState.length > 0) await pushTaskFoldersToSupabase(currentUserId, taskFoldersState);
+      if (folderTasksState && folderTasksState.length > 0) await pushFolderTasksToSupabase(currentUserId, folderTasksState);
+
+      await loadUserDataFromSupabase(currentUserId);
+      if (btn) btn.textContent = '✅ Synced!';
+      setTimeout(() => {
+        if (btn) btn.textContent = '☁️ Sync';
+      }, 2500);
+      alert(`Cloud sync complete! ${todosState.length} tasks synced to your account.`);
+    } catch (err) {
+      console.error('Manual sync error:', err);
+      if (btn) btn.textContent = '⚠️ Failed';
+      alert('Sync encountered an issue. Check console for details.');
+    }
+  });
+
   document.getElementById('btn-close-auth-modal')?.addEventListener('click', () => {
     modalAuth?.classList.add('hidden');
   });
