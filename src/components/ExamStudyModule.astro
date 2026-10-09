@@ -1,0 +1,685 @@
+---
+// ExamStudyModule.astro — AI Exam Roadmap, Visual Flowchart Engine & Spaced Timetable
+---
+
+<div class="space-y-6">
+  <!-- Top Exam Command Center -->
+  <div class="card-mobbin p-6 sm:p-8 space-y-6">
+    <div class="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#0066ff]/10 dark:bg-[#3b82f6]/10 text-[#0066ff] dark:text-[#60a5fa] border border-[#0066ff]/20">
+            Exam Prep Intelligence
+          </span>
+          <span id="exam-badge-days" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#f1f3f5] dark:bg-[#27272a] text-[#52525b] dark:text-[#a1a1aa]">
+            7 Days Remaining
+          </span>
+        </div>
+        <h2 id="exam-display-title" class="font-heading text-2xl text-[#09090b] dark:text-white">
+          Mid-Term 1 Examinations
+        </h2>
+        <p class="font-subheading text-xs text-[#71717a] dark:text-[#a1a1aa]">
+          Visual flowchart roadmap, AI spaced-repetition revision timetable, and syllabus mastery tracker
+        </p>
+      </div>
+
+      <!-- Action Button Group -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button 
+          id="btn-open-ai-generator" 
+          class="pill-primary text-xs flex items-center gap-1.5 shadow-md shadow-blue-500/20 !bg-gradient-to-r !from-blue-600 !to-indigo-600 hover:!opacity-95"
+        >
+          <span>⚡ AI Study Roadmap</span>
+        </button>
+
+        <button 
+          id="btn-add-node-manual" 
+          class="pill-soft text-xs flex items-center gap-1.5"
+          title="Add a custom topic node to the flowchart"
+        >
+          <span>➕ Add Topic</span>
+        </button>
+
+        <button 
+          id="btn-scratch-flowchart" 
+          class="pill-soft text-xs text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white"
+          title="Create a completely blank flowchart canvas from scratch"
+        >
+          <span>📄 Blank Canvas</span>
+        </button>
+
+        <button 
+          id="btn-sync-tcs-subjects" 
+          class="pill-soft text-xs text-[#0066ff] dark:text-[#60a5fa]"
+          title="Sync subjects enrolled in TCS iON Attendance"
+        >
+          <span>🔄 Sync TCS Courses</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Countdown & Readiness Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Countdown Ticker Box -->
+      <div class="md:col-span-2 p-5 rounded-2xl bg-gradient-to-br from-[#141414] to-[#27272a] dark:from-[#121215] dark:to-[#18181b] text-white space-y-3 border border-[#3f3f46]/40 shadow-sm">
+        <div class="flex items-center justify-between text-xs text-[#a1a1aa]">
+          <span class="flex items-center gap-1.5 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Exam Day Countdown
+          </span>
+          <button id="btn-edit-exam-date" class="text-xs text-sky-400 hover:underline">Edit Date</button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 text-center pt-1">
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+            <div id="countdown-days" class="font-heading text-2xl sm:text-3xl text-white">06</div>
+            <div class="text-[10px] text-[#a1a1aa] uppercase font-semibold mt-0.5">Days</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+            <div id="countdown-hours" class="font-heading text-2xl sm:text-3xl text-white">14</div>
+            <div class="text-[10px] text-[#a1a1aa] uppercase font-semibold mt-0.5">Hours</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+            <div id="countdown-minutes" class="font-heading text-2xl sm:text-3xl text-white">28</div>
+            <div class="text-[10px] text-[#a1a1aa] uppercase font-semibold mt-0.5">Mins</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+            <div id="countdown-seconds" class="font-heading text-2xl sm:text-3xl text-emerald-400">45</div>
+            <div class="text-[10px] text-[#a1a1aa] uppercase font-semibold mt-0.5">Secs</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-[#a1a1aa] pt-1">
+          <span id="countdown-target-text">Target: 7 Days Ahead (Mid-Terms)</span>
+          <span class="text-emerald-400 font-medium">Spaced repetition active</span>
+        </div>
+      </div>
+
+      <!-- Syllabus Mastery Metric -->
+      <div class="p-5 rounded-2xl card-inner-well flex flex-col justify-between">
+        <div class="space-y-1">
+          <span class="text-xs text-[#71717a] dark:text-[#a1a1aa]">Syllabus Flowchart Mastery</span>
+          <div class="flex items-baseline gap-2">
+            <div id="metric-mastery-pct" class="font-heading text-3xl text-[#09090b] dark:text-white">38%</div>
+            <span id="metric-nodes-ratio" class="text-xs text-[#71717a] dark:text-[#a1a1aa]">5 of 13 topics</span>
+          </div>
+        </div>
+        <div class="space-y-1.5 pt-3">
+          <div class="w-full bg-[#e4e4e7] dark:bg-[#3f3f46] h-2 rounded-full overflow-hidden">
+            <div id="metric-mastery-bar" class="bg-[#0066ff] dark:bg-[#3b82f6] h-full transition-all duration-300" style="width: 38%;"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-[#71717a] dark:text-[#a1a1aa]">
+            <span id="metric-mastered-count">3 Mastered</span>
+            <span id="metric-in-progress-count">2 In Progress</span>
+            <span id="metric-todo-count">8 To Do</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revision Hours Scheduled & Done -->
+      <div class="p-5 rounded-2xl card-inner-well flex flex-col justify-between">
+        <div class="space-y-1">
+          <span class="text-xs text-[#71717a] dark:text-[#a1a1aa]">Revision Hours Logged</span>
+          <div class="flex items-baseline gap-2">
+            <div id="metric-completed-hours" class="font-heading text-3xl text-[#047857] dark:text-[#34d399]">7.5h</div>
+            <span id="metric-total-hours" class="text-xs text-[#71717a] dark:text-[#a1a1aa]">of 38.0h total</span>
+          </div>
+        </div>
+        <div class="space-y-1.5 pt-3">
+          <div class="w-full bg-[#e4e4e7] dark:bg-[#3f3f46] h-2 rounded-full overflow-hidden">
+            <div id="metric-hours-bar" class="bg-[#047857] dark:bg-[#34d399] h-full transition-all duration-300" style="width: 20%;"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-[#71717a] dark:text-[#a1a1aa]">
+            <span id="metric-completed-slots">3 / 28 sessions completed</span>
+            <span id="metric-efficiency">94% on track</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segmented Sub-View Switcher -->
+    <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+      <div class="inline-flex p-1 bg-[#f1f3f5] dark:bg-[#27272a] rounded-full border border-[#e4e4e7] dark:border-[#3f3f46] text-xs">
+        <button 
+          id="btn-subview-flowchart" 
+          class="exam-subview-tab active px-4 py-1.5 rounded-full bg-[#09090b] dark:bg-white text-white dark:text-[#09090b] font-semibold transition-all shadow-sm flex items-center gap-1.5"
+          data-subview="flowchart"
+        >
+          <span>🗺️ Visual Flowchart Canvas</span>
+        </button>
+
+        <button 
+          id="btn-subview-timetable" 
+          class="exam-subview-tab px-4 py-1.5 rounded-full text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white font-medium transition-all flex items-center gap-1.5"
+          data-subview="timetable"
+        >
+          <span>📅 Day-by-Day Timetable</span>
+        </button>
+
+        <button 
+          id="btn-subview-pomodoro" 
+          class="exam-subview-tab px-4 py-1.5 rounded-full text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white font-medium transition-all flex items-center gap-1.5"
+          data-subview="pomodoro"
+        >
+          <span>⏱️ Pomodoro Station</span>
+        </button>
+      </div>
+
+      <!-- Subject Filter Pills (Flowchart & Timetable) -->
+      <div id="exam-subject-filter-container" class="flex items-center gap-1.5 overflow-x-auto text-xs py-1">
+        <button class="exam-filter-btn active px-3 py-1 rounded-full bg-[#09090b] dark:bg-white text-white dark:text-[#09090b] font-semibold" data-subject="all">
+          All Subjects
+        </button>
+        <!-- Dynamic subject filter pills inserted by app.ts -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SUB-VIEW 1: INTERACTIVE VISUAL FLOWCHART CANVAS -->
+  <!-- ============================================================== -->
+  <div id="exam-subview-flowchart-container" class="space-y-4">
+    <!-- Flowchart Canvas Toolbar & Phase Legend -->
+    <div class="p-4 rounded-2xl card-mobbin flex flex-wrap items-center justify-between gap-4">
+      <!-- 4 Phase Progress Legend -->
+      <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+          <span class="font-semibold text-[#09090b] dark:text-white">Phase 1:</span>
+          <span class="text-[#71717a] dark:text-[#a1a1aa]">Core Theory & Units</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+          <span class="font-semibold text-[#09090b] dark:text-white">Phase 2:</span>
+          <span class="text-[#71717a] dark:text-[#a1a1aa]">Numericals & Formulas</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+          <span class="font-semibold text-[#09090b] dark:text-white">Phase 3:</span>
+          <span class="text-[#71717a] dark:text-[#a1a1aa]">PYQ Mastery (Past Papers)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+          <span class="font-semibold text-[#09090b] dark:text-white">Phase 4:</span>
+          <span class="text-[#71717a] dark:text-[#a1a1aa]">Mock Exam & Readiness</span>
+        </div>
+      </div>
+
+      <!-- Canvas Toolbar Controls -->
+      <div class="flex items-center gap-2">
+        <button id="btn-flowchart-auto-layout" class="pill-soft text-xs py-1 px-3" title="Auto-align nodes in sequential columns">
+          ⚡ Auto-Layout
+        </button>
+        <button id="btn-flowchart-export" class="pill-soft text-xs py-1 px-3" title="Export flowchart as JSON backup">
+          📤 Export
+        </button>
+        <button id="btn-flowchart-reset-zoom" class="pill-soft text-xs py-1 px-2.5" title="Reset Canvas View">
+          ↺ 100%
+        </button>
+      </div>
+    </div>
+
+    <!-- Visual Graph Canvas -->
+    <div class="card-mobbin p-4 sm:p-6 overflow-hidden relative min-h-[580px] bg-[#fdfdfd] dark:bg-[#121215] border border-[#e4e4e7] dark:border-[#27272a] rounded-3xl">
+      <!-- Background Engineering Grid Pattern -->
+      <div class="absolute inset-0 bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none opacity-60"></div>
+
+      <!-- Flowchart Canvas Wrapper (Scrollable & Responsive) -->
+      <div id="flowchart-canvas-wrapper" class="overflow-x-auto overflow-y-auto w-full min-h-[560px] relative scrollbar-thin">
+        <div id="flowchart-canvas" class="relative min-w-[1300px] min-h-[850px] py-4 transition-transform duration-150 origin-top-left">
+          <!-- SVG Layer for Bezier Connector Arrows -->
+          <svg id="flowchart-svg-layer" class="absolute inset-0 w-full h-full pointer-events-none z-10">
+            <defs>
+              <!-- Arrowhead markers -->
+              <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 9 5 L 0 9 z" fill="#a1a1aa" />
+              </marker>
+              <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 9 5 L 0 9 z" fill="#10b981" />
+              </marker>
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 9 5 L 0 9 z" fill="#3b82f6" />
+              </marker>
+            </defs>
+            <!-- Dynamic connector curves rendered here -->
+          </svg>
+
+          <!-- Nodes Container -->
+          <div id="flowchart-nodes-container" class="relative z-20">
+            <!-- Dynamic Flowchart Nodes rendered here by app.ts -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SUB-VIEW 2: DAY-BY-DAY TIMETABLE -->
+  <!-- ============================================================== -->
+  <div id="exam-subview-timetable-container" class="space-y-6 hidden">
+    <!-- Day Navigation Tabs Bar -->
+    <div class="card-mobbin p-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="font-heading text-sm text-[#09090b] dark:text-white">Select Day:</span>
+        <div id="timetable-day-pills" class="flex items-center gap-1.5 overflow-x-auto py-1">
+          <!-- Dynamic day buttons (Day 0: Today, Day 1: Tomorrow, etc.) -->
+        </div>
+      </div>
+
+      <button id="btn-add-timetable-slot" class="pill-primary text-xs flex items-center gap-1.5">
+        <span>➕ Add Study Session</span>
+      </button>
+    </div>
+
+    <!-- Active Day Schedule Card -->
+    <div class="card-mobbin p-6 sm:p-8 space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+        <div>
+          <h3 id="active-day-heading" class="font-heading text-xl text-[#09090b] dark:text-white">
+            Today's Schedule & Targets
+          </h3>
+          <p id="active-day-subheading" class="font-caption text-xs text-[#71717a] dark:text-[#a1a1aa]">
+            Spaced revision sessions tailored for maximum retention
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="active-day-progress-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#047857]/10 text-[#047857] dark:text-[#34d399]">
+            0 / 4 Sessions Completed
+          </span>
+        </div>
+      </div>
+
+      <!-- Slots Grid for the Active Day -->
+      <div id="timetable-slots-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Dynamic Timetable slots rendered by app.ts -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SUB-VIEW 3: POMODORO FOCUS STATION -->
+  <!-- ============================================================== -->
+  <div id="exam-subview-pomodoro-container" class="card-mobbin p-6 sm:p-10 space-y-8 hidden text-center max-w-2xl mx-auto">
+    <div class="space-y-2">
+      <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#0066ff]/10 text-[#0066ff] dark:text-[#60a5fa] border border-[#0066ff]/20">
+        Active Study Sprint
+      </span>
+      <h3 class="font-heading text-2xl text-[#09090b] dark:text-white">
+        Pomodoro Focus Station
+      </h3>
+      <p class="text-xs text-[#71717a] dark:text-[#a1a1aa] max-w-md mx-auto">
+        Deep work intervals with ambient audio. Connect each session directly to a flowchart topic to track study hours!
+      </p>
+    </div>
+
+    <!-- Active Topic Selector -->
+    <div class="max-w-md mx-auto card-inner-well p-3 rounded-2xl flex items-center gap-2.5 text-xs">
+      <span class="font-semibold text-[#09090b] dark:text-white shrink-0">Studying Topic:</span>
+      <select id="pomo-node-select" class="field-input flex-1 text-xs py-1.5 px-3">
+        <!-- Dynamic options from flowchart nodes -->
+      </select>
+    </div>
+
+    <!-- Big Circular Visual Timer -->
+    <div class="relative w-64 h-64 mx-auto flex items-center justify-center">
+      <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="6" class="text-[#e4e4e7] dark:text-[#27272a] fill-none" />
+        <circle 
+          id="pomo-progress-ring" 
+          cx="50" 
+          cy="50" 
+          r="44" 
+          stroke="currentColor" 
+          stroke-width="6" 
+          class="text-[#0066ff] dark:text-[#3b82f6] fill-none transition-all duration-300 stroke-round" 
+          stroke-dasharray="276.46" 
+          stroke-dashoffset="0"
+        />
+      </svg>
+      <div class="absolute inset-0 flex flex-col items-center justify-center">
+        <span id="pomo-display-time" class="font-heading text-5xl tracking-tight text-[#09090b] dark:text-white font-mono">
+          25:00
+        </span>
+        <span id="pomo-mode-badge" class="mt-1 text-xs font-semibold text-[#71717a] dark:text-[#a1a1aa] uppercase tracking-wider">
+          Focus Session
+        </span>
+      </div>
+    </div>
+
+    <!-- Timer Controls -->
+    <div class="flex items-center justify-center gap-3">
+      <button id="btn-pomo-start" class="pill-primary text-sm py-2.5 px-8 !bg-[#0066ff] hover:!bg-[#0052cc]">
+        Start Focus
+      </button>
+      <button id="btn-pomo-pause" class="pill-soft text-sm py-2.5 px-6 hidden">
+        Pause
+      </button>
+      <button id="btn-pomo-reset" class="pill-soft text-sm py-2.5 px-5">
+        Reset
+      </button>
+      <button id="btn-pomo-skip" class="pill-soft text-sm py-2.5 px-4" title="Switch between Focus & Break">
+        Skip ⏭
+      </button>
+    </div>
+
+    <!-- Total Minutes Logged -->
+    <div class="pt-4 border-t border-[#e4e4e7] dark:border-[#27272a] flex items-center justify-around text-xs text-[#71717a] dark:text-[#a1a1aa]">
+      <div>
+        <span>Total Logged Today:</span>
+        <span id="pomo-logged-mins" class="font-heading text-base text-[#09090b] dark:text-white ml-1.5">85 mins</span>
+      </div>
+      <div>
+        <span>Sessions Done:</span>
+        <span id="pomo-completed-sprints" class="font-heading text-base text-[#047857] dark:text-[#34d399] ml-1.5">3 sprints</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 1: AI STUDY ROADMAP & SCHEDULE GENERATOR -->
+<!-- ============================================================== -->
+<div id="modal-ai-generator" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-ai-generator">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-xl p-6 sm:p-8 shadow-2xl space-y-5 relative z-10 opacity-100" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-blue-500/20">
+          ⚡
+        </div>
+        <div>
+          <h3 class="font-heading text-lg text-[#09090b] dark:text-white">AI Exam Study Scheduler</h3>
+          <p class="font-caption text-xs text-[#71717a] dark:text-[#a1a1aa]">Generate optimal flowcharts & day-by-day timetables</p>
+        </div>
+      </div>
+      <button id="btn-close-ai-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <form id="form-ai-generator" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Exam Name</label>
+          <input 
+            type="text" 
+            id="ai-input-exam-name" 
+            value="Mid-Term 1 Examinations" 
+            class="field-input w-full text-xs font-medium"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Exam Start Date</label>
+          <input 
+            type="date" 
+            id="ai-input-exam-date" 
+            class="field-input w-full text-xs"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Enrolled Subjects Selector -->
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white">Subjects to Prepare</label>
+          <button 
+            type="button" 
+            id="btn-ai-import-tcs" 
+            class="text-[11px] font-semibold text-[#0066ff] dark:text-[#60a5fa] hover:underline"
+          >
+            ✨ Import Enrolled Subjects from TCS iON
+          </button>
+        </div>
+        <textarea 
+          id="ai-input-subjects" 
+          rows="3" 
+          class="field-input w-full text-xs font-mono"
+          placeholder="Engineering Physics
+Basic Civil Engineering
+Campus Recruitment Training
+Engineering Mathematics-I"
+        ></textarea>
+        <span class="text-[11px] text-[#71717a] dark:text-[#a1a1aa]">One subject per line</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Daily Study Hours</label>
+          <select id="ai-input-daily-hours" class="field-input w-full text-xs">
+            <option value="4">4 Hours / day (Moderate)</option>
+            <option value="6" selected>6 Hours / day (Balanced Target)</option>
+            <option value="8">8 Hours / day (Intensive Prep)</option>
+            <option value="10">10 Hours / day (Crash Course)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Revision Strategy</label>
+          <select id="ai-input-strategy" class="field-input w-full text-xs">
+            <option value="high_yield_pyq" selected>High-Yield PYQs & Numericals</option>
+            <option value="balanced">Balanced (All units evenly)</option>
+            <option value="cram_revision">Exam Eve Rapid Cramming</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Weak Subject / Extra Focus (Optional)</label>
+        <input 
+          type="text" 
+          id="ai-input-weak-subject" 
+          placeholder="e.g. Engineering Physics or Civil Surveying" 
+          class="field-input w-full text-xs"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Custom Guidance / AI Prompt (Optional)</label>
+        <input 
+          type="text" 
+          id="ai-input-custom-prompt" 
+          placeholder="e.g. Give 60% time to numericals and formulas, 40% to theory" 
+          class="field-input w-full text-xs"
+        />
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-[#e4e4e7] dark:border-[#27272a]">
+        <button type="button" id="btn-cancel-ai" class="pill-soft text-xs">
+          Cancel
+        </button>
+        <button type="submit" id="btn-submit-ai" class="pill-primary text-xs !bg-gradient-to-r !from-blue-600 !to-indigo-600">
+          ⚡ Generate AI Roadmap & Timetable
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 2: ADD / EDIT FLOWCHART NODE -->
+<!-- ============================================================== -->
+<div id="modal-edit-node" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-edit-node">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-lg p-6 sm:p-7 shadow-2xl space-y-4 relative z-10 opacity-100" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <h3 id="modal-node-title" class="font-heading text-lg text-[#09090b] dark:text-white">Add Topic Node</h3>
+      <button id="btn-close-node-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <form id="form-edit-node" class="space-y-3.5">
+      <input type="hidden" id="node-form-id" />
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Topic / Chapter Title</label>
+        <input 
+          type="text" 
+          id="node-form-title" 
+          placeholder="e.g. Unit 1: Wave Optics & Newton Rings" 
+          class="field-input w-full text-xs"
+          required
+        />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Subject</label>
+          <input 
+            type="text" 
+            id="node-form-subject" 
+            placeholder="e.g. Engineering Physics" 
+            class="field-input w-full text-xs"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Flowchart Phase</label>
+          <select id="node-form-phase" class="field-input w-full text-xs">
+            <option value="phase1_fundamentals">Phase 1: Core Fundamentals</option>
+            <option value="phase2_practice">Phase 2: Practice & Lab Viva</option>
+            <option value="phase3_pyqs">Phase 3: PYQ Mastery</option>
+            <option value="phase4_mock_revision">Phase 4: Mock & Final Review</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Est. Hours</label>
+          <input 
+            type="number" 
+            id="node-form-hours" 
+            step="0.5" 
+            min="0.5" 
+            max="20" 
+            value="3.0" 
+            class="field-input w-full text-xs"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Priority</label>
+          <select id="node-form-priority" class="field-input w-full text-xs">
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Status</label>
+          <select id="node-form-status" class="field-input w-full text-xs">
+            <option value="todo" selected>To Do</option>
+            <option value="in_progress">In Progress</option>
+            <option value="mastered">Mastered</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Connect to Subsequent Topics (Child Nodes)</label>
+        <select id="node-form-connects" multiple class="field-input w-full text-xs h-20">
+          <!-- Dynamic options of other nodes -->
+        </select>
+        <span class="text-[10px] text-[#71717a] dark:text-[#a1a1aa]">Hold Ctrl/Cmd to select multiple connecting topics</span>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Key Notes / Formulas to Remember</label>
+        <textarea 
+          id="node-form-notes" 
+          rows="2" 
+          placeholder="Important formulas, recurring exam questions..."
+          class="field-input w-full text-xs"
+        ></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-[#e4e4e7] dark:border-[#27272a]">
+        <button type="button" id="btn-delete-node" class="pill-soft text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 hidden">
+          Delete Node
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" id="btn-cancel-node" class="pill-soft text-xs">
+            Cancel
+          </button>
+          <button type="submit" class="pill-primary text-xs">
+            Save Topic Node
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 3: ADD / EDIT TIMETABLE SESSION -->
+<!-- ============================================================== -->
+<div id="modal-edit-slot" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" data-modal="modal-edit-slot">
+  <div class="card-mobbin bg-white dark:bg-[#18181b] border border-[#e4e4e7] dark:border-[#27272a] w-full max-w-md p-6 sm:p-7 shadow-2xl space-y-4 relative z-10 opacity-100" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between pb-3 border-b border-[#e4e4e7] dark:border-[#27272a]">
+      <h3 id="modal-slot-title" class="font-heading text-lg text-[#09090b] dark:text-white">Study Session</h3>
+      <button id="btn-close-slot-modal" class="text-[#71717a] dark:text-[#a1a1aa] hover:text-[#09090b] dark:hover:text-white p-1 text-xl font-bold">&times;</button>
+    </div>
+
+    <form id="form-edit-slot" class="space-y-3.5">
+      <input type="hidden" id="slot-form-id" />
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Subject</label>
+        <input 
+          type="text" 
+          id="slot-form-subject" 
+          placeholder="e.g. Engineering Physics" 
+          class="field-input w-full text-xs"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Topic Objective</label>
+        <input 
+          type="text" 
+          id="slot-form-topic" 
+          placeholder="e.g. Solve Newton Rings & Wave equation numericals" 
+          class="field-input w-full text-xs"
+          required
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Time Range</label>
+          <input 
+            type="text" 
+            id="slot-form-time" 
+            value="09:00 AM - 11:30 AM" 
+            class="field-input w-full text-xs"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[#09090b] dark:text-white mb-1.5">Target Hours</label>
+          <input 
+            type="number" 
+            id="slot-form-hours" 
+            step="0.5" 
+            min="0.5" 
+            max="8" 
+            value="2.5" 
+            class="field-input w-full text-xs"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-[#e4e4e7] dark:border-[#27272a]">
+        <button type="button" id="btn-delete-slot" class="pill-soft text-xs text-rose-600 dark:text-rose-400 hidden">
+          Delete Session
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" id="btn-cancel-slot" class="pill-soft text-xs">
+            Cancel
+          </button>
+          <button type="submit" class="pill-primary text-xs">
+            Save Session
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

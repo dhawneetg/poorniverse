@@ -103,3 +103,56 @@ export interface MessDayMenu {
   specialMeal?: string;
   rating?: number;
 }
+
+export type FlowchartNodeStatus = 'todo' | 'in_progress' | 'mastered';
+export type FlowchartPhase = 'phase1_fundamentals' | 'phase2_practice' | 'phase3_pyqs' | 'phase4_mock_revision';
+
+export interface FlowchartNode {
+  id: string;
+  subject: string;
+  title: string;
+  phase: FlowchartPhase;
+  phaseLabel?: string;
+  status: FlowchartNodeStatus;
+  estimatedHours: number;
+  priority: 'high' | 'medium' | 'low';
+  notes?: string;
+  connectsTo: string[];
+  x?: number;
+  y?: number;
+  isCustom?: boolean;
+}
+
+export interface TimetableSlot {
+  id: string;
+  dayIndex: number;
+  dayName: string;
+  dateStr: string;
+  slotName: 'morning' | 'afternoon' | 'evening' | 'night';
+  timeRange: string;
+  subject: string;
+  topic: string;
+  targetHours: number;
+  nodeId?: string;
+  completed: boolean;
+  notes?: string;
+}
+
+export interface ExamStudyState {
+  examName: string;
+  targetDate: string;
+  dailyStudyHours: number;
+  strategy: 'balanced' | 'high_yield_pyq' | 'cram_revision';
+  focusSubjects: string[];
+  nodes: FlowchartNode[];
+  timetable: TimetableSlot[];
+  pomodoro: {
+    durationMinutes: number;
+    breakMinutes: number;
+    activeSubject: string;
+    activeNodeId?: string;
+    totalMinutesLogged: number;
+  };
+  lastUpdated: string;
+}
+

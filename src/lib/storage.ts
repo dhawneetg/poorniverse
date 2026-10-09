@@ -137,6 +137,7 @@ const KEYS = {
   SETTINGS: 'poornima_app_settings',
   TASK_FOLDERS: 'poornima_task_folders',
   FOLDER_TASKS: 'poornima_folder_tasks',
+  EXAM_STUDY: 'poornima_exam_study',
 };
 
 export function getStoredData<T>(key: string, defaultValue: T): T {

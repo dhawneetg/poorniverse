@@ -6,6 +6,7 @@ import AttendanceModule from '../components/AttendanceModule.astro';
 import HostelQuotasModule from '../components/HostelQuotasModule.astro';
 import TodoModule from '../components/TodoModule.astro';
 import CampusToolsModule from '../components/CampusToolsModule.astro';
+import ExamStudyModule from '../components/ExamStudyModule.astro';
 import SettingsModal from '../components/SettingsModal.astro';
 import AuthModal from '../components/AuthModal.astro';
 import ExtensionModal from '../components/ExtensionModal.astro';
@@ -34,6 +35,11 @@ import ExtensionModal from '../components/ExtensionModal.astro';
       <!-- VIEW 4: Campus Tools (SGPA & Mess) -->
       <section id="view-tools" class="view-section hidden">
         <CampusToolsModule />
+      </section>
+
+      <!-- VIEW 5: AI Exam Prep & Flowchart Roadmap -->
+      <section id="view-exams" class="view-section hidden">
+        <ExamStudyModule />
       </section>
     </main>
 
@@ -73,6 +79,7 @@ import ExtensionModal from '../components/ExtensionModal.astro';
           <div class="space-y-3">
             <h4 class="font-heading text-xs uppercase tracking-wider text-white">Academic Modules</h4>
             <ul class="space-y-2 text-xs text-[#adadad] dark:text-[#a1a1aa]">
+              <li><button class="footer-nav-btn hover:text-white transition-colors text-left text-sky-400 font-semibold" data-view="exams">⚡ AI Exam Prep & Flowchart Roadmap</button></li>
               <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="attendance">TCS iON Attendance Engine</button></li>
               <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="attendance">75% Safe Bunk Calculator</button></li>
               <li><button class="footer-nav-btn hover:text-white transition-colors text-left" data-view="attendance">Attendance Recovery Forecaster</button></li>

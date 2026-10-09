@@ -35,6 +35,7 @@ import {
   pushFolderTasksToSupabase,
 } from '../lib/supabase-sync';
 import { autoSyncMessMenu, formatMealForCollege, type CollegeCode } from '../lib/mess-sync';
+import { setupExamStudy } from './exam-study';
 
 // State references
 let currentUserId: string | null = null;
@@ -150,6 +151,35 @@ export function initApp() {
   setupExtensionModal();
   updateHeaderTicker();
   checkSupabaseSession();
+  checkUrlSyncHash();
+  setupExamStudy(() => attendanceState);
+}
+
+function checkUrlSyncHash() {
+  if (typeof window === 'undefined') return;
+  if (window.location.hash.includes('tcs_sync=')) {
+    try {
+      const match = window.location.hash.match(/tcs_sync=([^&]+)/);
+      if (match) {
+        const rawJson = decodeURIComponent(match[1]);
+        const parsed = parseTcsIonText(rawJson);
+        if (parsed.length > 0) {
+          attendanceState = parsed;
+          setStoredData(KEYS.ATTENDANCE, attendanceState);
+          if (currentUserId) {
+            pushAttendanceToSupabase(currentUserId, attendanceState).catch(() => {});
+          }
+          renderAttendance();
+          updateHeaderTicker();
+          confetti({ particleCount: 60, spread: 70 });
+          alert(`🎉 Successfully synchronized ${parsed.length} courses from TCS iON!`);
+        }
+        history.replaceState(null, '', window.location.pathname);
+      }
+    } catch (e) {
+      console.warn('Error processing tcs_sync hash:', e);
+    }
+  }
 }
 
 // -------------------------------------------------------------
@@ -202,6 +232,7 @@ function switchMainView(target: string) {
     hostel: document.getElementById('view-hostel'),
     todos: document.getElementById('view-todos'),
     tools: document.getElementById('view-tools'),
+    exams: document.getElementById('view-exams'),
   };
 
   navButtons.forEach(b => {
@@ -619,6 +650,21 @@ function setupAttendanceModule() {
   });
   document.getElementById('btn-cancel-paste')?.addEventListener('click', () => {
     modalPaste?.classList.add('hidden');
+  });
+
+  document.getElementById('btn-clipboard-paste-tcs')?.addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const pasteInput = document.getElementById('tcs-paste-input') as HTMLTextAreaElement;
+      if (pasteInput && text) {
+        pasteInput.value = text;
+        document.getElementById('btn-process-paste')?.click();
+      } else {
+        alert('Clipboard is empty. Please copy attendance data from TCS iON first.');
+      }
+    } catch (e) {
+      alert('Clipboard permission denied or unavailable. Please paste manually (Ctrl + V) into the box.');
+    }
   });
 
   document.getElementById('btn-load-sample-tcs')?.addEventListener('click', () => {
